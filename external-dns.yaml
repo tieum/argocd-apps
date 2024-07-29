@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: external-dns
+  annotations:
+    avp.kubernetes.io/path: "secrets.sops"
+spec:
+  project: default
+  source:
+    chart: external-dns
+    repoURL: https://kubernetes-sigs.github.io/external-dns
+    targetRevision: 1.14.5
+    helm:
+      version: v3
+      valuesObject:
+        provider:
+          name: ovh
+        env:
+        - name: OVH_APPLICATION_KEY
+          value: <external-dns | jsonPath {.ovh_application_key} >
+        - name: OVH_APPLICATION_SECRET
+          value: <external-dns | jsonPath {.ovh_application_secret} >
+        - name: OVH_CONSUMER_KEY
+          value: <external-dns | jsonPath {.ovh_consumer_key} >
+  destination:
+    name: "in-cluster"
+    namespace: external-dns
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=true
