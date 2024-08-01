@@ -49,7 +49,7 @@ spec:
             ingressClassName: nginx
             annotations:
               external-dns.alpha.kubernetes.io/hostname: <plex | jsonPath {.url}>
-              cert-manager.io/cluster-issuer: "letsencrypt-prod"
+              cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
           pms:
             configExistingClaim: pvc-plex
           extraEnv:
