@@ -6,54 +6,73 @@ metadata:
     avp.kubernetes.io/path: "secrets.sops"
 spec:
   project: default
-  source:
-    chart: cert-manager
-    repoURL: https://charts.jetstack.io
-    targetRevision: 1.15.2
-    helm:
-      version: v3
-      valuesObject:
-        crds:
-          enabled: true
-        extraObjects:
-          - |
-            apiVersion: cert-manager.io/v1
-            kind: ClusterIssuer
-            metadata:
-              name: letsencrypt-staging
-            spec:
-              acme:
-                # The ACME server URL
-                server: https://acme-staging-v02.api.letsencrypt.org/directory
-                # Email address used for ACME registration
-                email: <cert-manager | jsonPath {.email} >
-                # Name of a secret used to store the ACME account private key
-                privateKeySecretRef:
-                  name: letsencrypt-staging
-                # Enable the HTTP-01 challenge provider
-                solvers:
-                - http01:
-                    ingress:
-                      class: nginx
-          - |
-            apiVersion: cert-manager.io/v1
-            kind: ClusterIssuer
-            metadata:
-              name: letsencrypt-prod
-            spec:
-              acme:
-                # The ACME server URL
-                server: https://acme-v02.api.letsencrypt.org/directory
-                # Email address used for ACME registration
-                email: <cert-manager | jsonPath {.email} >
-                # Name of a secret used to store the ACME account private key
-                privateKeySecretRef:
-                  name: letsencrypt-prod
-                # Enable the HTTP-01 challenge provider
-                solvers:
-                - http01:
-                    ingress:
-                      class: nginx
+  sources:
+    - chart: cert-manager
+      repoURL: https://charts.jetstack.io
+      targetRevision: 1.15.2
+      helm:
+        version: v3
+        valuesObject:
+          crds:
+            enabled: true
+          extraObjects:
+            - |
+              apiVersion: cert-manager.io/v1
+              kind: ClusterIssuer
+              metadata:
+                name: letsencrypt-staging
+              spec:
+                acme:
+                  # The ACME server URL
+                  server: https://acme-staging-v02.api.letsencrypt.org/directory
+                  # Email address used for ACME registration
+                  email: <cert-manager | jsonPath {.email} >
+                  # Name of a secret used to store the ACME account private key
+                  privateKeySecretRef:
+                    name: letsencrypt-staging
+                  # Enable the HTTP-01 challenge provider
+                  solvers:
+                  - http01:
+                      ingress:
+                        class: nginx
+            - |
+              apiVersion: cert-manager.io/v1
+              kind: ClusterIssuer
+              metadata:
+                name: letsencrypt-prod
+              spec:
+                acme:
+                  # The ACME server URL
+                  server: https://acme-v02.api.letsencrypt.org/directory
+                  # Email address used for ACME registration
+                  email: <cert-manager | jsonPath {.email} >
+                  # Name of a secret used to store the ACME account private key
+                  privateKeySecretRef:
+                    name: letsencrypt-prod
+                  # Enable the HTTP-01 challenge provider
+                  solvers:
+                  - http01:
+                      ingress:
+                        class: nginx
+    - chart: cert-manager-webhook-ovh
+      repoURL: https://aureq.github.io/cert-manager-webhook-ovh/
+      targetRevision: 0.6.0
+      helm:
+        version: v3
+        valuesObject:
+          groupName: <cert-manager | jsonPath {.groupname} >
+          issuers:
+            - name: letsencrypt-dns-prod
+              create: true
+              kind: ClusterIssuer
+              cnameStrategy: None
+              acmeServerUrl: https://acme-v02.api.letsencrypt.org/directory
+              email: <cert-manager | jsonPath {.email} >
+              ovhEndpointName: ovh-eu
+              ovhAuthentication:
+                applicationKey: <ovh | jsonPath {.ovh_application_key} >
+                applicationSecret: <ovh | jsonPath {.ovh_application_secret} >
+                consumerKey: <ovh | jsonPath {.ovh_consumer_key} >
   destination:
     name: "in-cluster"
     namespace: cert-manager

@@ -17,11 +17,11 @@ spec:
           name: ovh
         env:
         - name: OVH_APPLICATION_KEY
-          value: <external-dns | jsonPath {.ovh_application_key} >
+          value: <ovh | jsonPath {.ovh_application_key} >
         - name: OVH_APPLICATION_SECRET
-          value: <external-dns | jsonPath {.ovh_application_secret} >
+          value: <ovh | jsonPath {.ovh_application_secret} >
         - name: OVH_CONSUMER_KEY
-          value: <external-dns | jsonPath {.ovh_consumer_key} >
+          value: <ovh | jsonPath {.ovh_consumer_key} >
   destination:
     name: "in-cluster"
     namespace: external-dns
