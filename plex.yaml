@@ -25,7 +25,7 @@ spec:
                accessModes:
                  - ReadWriteOnce
                hostPath:
-                 path: "/mnt/pcloud/kube"
+                 path: "/mnt/kube/plex"
             - name: pvc-plex
               fullnameOverride: pvc-plex
               apiVersion: v1
