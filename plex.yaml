@@ -46,7 +46,7 @@ spec:
           ingress:
             enabled: true
             url: <plex| jsonPath {.url}>
-            ingressClassName: ingress-nginx
+            ingressClassName: nginx
             annotations:
               external-dns.alpha.kubernetes.io/hostname: <plex | jsonPath {.url}>
               cert-manager.io/cluster-issuer: "letsencrypt-prod"
