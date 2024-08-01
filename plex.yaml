@@ -1,0 +1,62 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: plex
+  annotations:
+    avp.kubernetes.io/path: "secrets.sops"
+spec:
+  project: default
+  sources:
+    - chart: k8s-resources
+      repoURL: https://charts.deliveryhero.io/
+      targetRevision: 0.6.6
+      helm:
+        version: v3
+        valuesObject:
+          CustomResources:
+            - name: pv-plex
+              fullnameOverride: pv-plex
+              apiVersion: v1
+              kind: PersistentVolume
+              spec:
+               storageClassName: manual
+               capacity:
+                 storage: 2Gi
+               accessModes:
+                 - ReadWriteOnce
+               hostPath:
+                 path: "/mnt/pcloud/kube"
+            - name: pvc-plex
+              fullnameOverride: pvc-plex
+              apiVersion: v1
+              kind: PersistentVolumeClaim
+              spec:
+               storageClassName: manual
+               accessModes:
+                 - ReadWriteOnce
+               resources:
+                  requests:
+                    storage: 2Gi
+    - chart: plex-media-server
+      repoURL: https://raw.githubusercontent.com/plexinc/pms-docker/gh-pages 
+      targetRevision: 0.4.0
+      helm:
+        version: v3
+        valuesObject:
+          ingress:
+            enabled: true
+            url: <plex| jsonPath {.url}>
+            ingressClassName: ingress-nginx
+            annotations:
+              external-dns.alpha.kubernetes.io/hostname: <plex | jsonPath {.url}>
+              cert-manager.io/cluster-issuer: "letsencrypt-prod"
+          pms:
+            configExistingClaim: pvc-plex
+          extraEnv:
+            PLEX_CLAIM: <plex | jsonPath {.claim}>
+  destination:
+    name: "in-cluster"
+    namespace: plex
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=true
