@@ -1,0 +1,54 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: rutorrent
+  annotations:
+    avp.kubernetes.io/path: "secrets.sops"
+spec:
+  project: default
+  source:
+    chart: rtorrent-rutorrent
+    repoURL: tccr.io/truecharts
+    targetRevision: 6.1.4
+    helm:
+      version: v3
+      valuesObject:
+        ingress:
+          main:
+            enabled: true
+            ingressClassName: nginx
+            annotations:
+              external-dns.alpha.kubernetes.io/hostname: <rutorrent | jsonPath {.url}>
+            hosts:
+              - host: <rutorrent | jsonPath {.url}>
+                paths:
+                  - path: /
+            tls:
+              - hosts:
+                  - <rutorrent | jsonPath {.url}>
+                certificateIssuer: letsencrypt-dns-prod
+        persistence:
+          data:
+            enabled: true
+            type: hostPath
+            mountPath: "/data"
+            hostPath: /mnt/kube/rutorrent/data
+            hostPathType: DirectoryOrCreate
+          downloads:
+            enabled: true
+            type: hostPath
+            mountPath: "/downloads"
+            hostPath: /mnt/kube/rutorrent/downloads
+            hostPathType: DirectoryOrCreate
+          passwd:
+            enabled: true
+            type: hostPath
+            mountPath: "/passwd"
+            hostPath: /mnt/kube/rutorrent/passwd
+            hostPathType: DirectoryOrCreate
+  destination:
+    name: "in-cluster"
+    namespace: rutorrent
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=true
