@@ -13,6 +13,15 @@ spec:
     helm:
       version: v3
       valuesObject:
+        grafana:
+          ingress:
+            enabled: true
+            ingressClassName: nginx
+            annotations:
+              external-dns.alpha.kubernetes.io/hostname: <grafana | jsonPath {.url}>
+              cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
+            hosts:
+              - <grafana | jsonPath {.url}>
   destination:
     name: "in-cluster"
     namespace: prometheus
