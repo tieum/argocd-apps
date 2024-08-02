@@ -14,6 +14,7 @@ spec:
       version: v3
       valuesObject:
         grafana:
+          adminPassword: <grafana | jsonPath {.adminpassword}>
           ingress:
             enabled: true
             ingressClassName: nginx
