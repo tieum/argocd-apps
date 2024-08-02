@@ -5,11 +5,15 @@ metadata:
 spec:
   project: default
   source:
-    helm:
-      version: v3
     chart: ingress-nginx
     repoURL: https://kubernetes.github.io/ingress-nginx
     targetRevision: 4.11.1
+    helm:
+      version: v3
+      valuesObject:
+        service:
+          externalIPs:
+          - <ingress-nginx | jsonPath {.externalip} >
   destination:
     name: "in-cluster"
     namespace: ingress-nginx
