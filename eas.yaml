@@ -1,0 +1,51 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: eas
+  annotations:
+    avp.kubernetes.io/path: "secrets.sops"
+spec:
+  project: default
+  source:
+    chart: external-auth-server
+    repoURL: https://travisghansen.github.io/external-auth-server
+    targetRevision: 0.2.3
+    helm:
+      version: v3
+      valuesObject:
+        configTokenSignSecret: <eas | jsonPath {.configTokenSignSecret}>
+        configTokenEncryptSecret: <eas | jsonPath {.configTokenEncryptSecret}>
+        issuerSignSecret: <eas | jsonPath {.issuerSignSecret}>
+        issuerEncryptSecret: <eas | jsonPath {.issuerEncryptSecret}>
+        cookieSignSecret: <eas | jsonPath {.cookieSignSecret}>
+        cookieEncryptSecret: <eas | jsonPath {.cookieEncryptSecret}>
+        sessionEncryptSecret: <eas | jsonPath {.sessionEncryptSecret}>
+        configTokenStores:
+          primary:
+            adapter: env
+            options:
+              cache_ttl: 0
+              var: EAS_CONFIG_TOKENS
+        configTokens:
+          github: <eas | jsonPath {.configTokenGithub}>
+        ingress:
+          enabled: true
+          className: "nginx"
+          annotations:
+            external-dns.alpha.kubernetes.io/hostname: <eas | jsonPath {.endpoint}>
+            cert-manager.io/cluster-issuer: letsencrypt-dns-prod
+          hosts:
+            - host: <eas | jsonPath {.endpoint}>
+              paths:
+                - path: /
+                  pathType: ImplementationSpecific
+          tls:
+            - hosts:
+                -  <eas | jsonPath {.endpoint}>
+              secretName: eas-tls
+  destination:
+    name: "in-cluster"
+    namespace: eas 
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=true
