@@ -27,6 +27,10 @@ spec:
                 auth_request_set $auth_redirect $upstream_http_location;
             hosts:
               - <grafana | jsonPath {.url}>
+            tls:
+              - secretName: grafana-general-tls
+                hosts:
+                - <grafana | jsonPath {.url}>
   destination:
     name: "in-cluster"
     namespace: prometheus
