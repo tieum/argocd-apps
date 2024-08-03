@@ -11,6 +11,8 @@ spec:
     helm:
       version: v3
       valuesObject:
+        controller:
+          allowSnippetAnnotations: true
         service:
           externalIPs:
           - <ingress-nginx | jsonPath {.externalip} >
