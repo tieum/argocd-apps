@@ -37,6 +37,17 @@ spec:
                resources:
                   requests:
                     storage: 2Gi
+          Secrets:
+            - name: pcloud
+              fullnameOverride: "pcloud"
+              annotations: {}
+              extraLabels: {}
+              b64Keys:
+                rclone.conf: |
+                  [pcloud]
+                  type = pcloud
+                  hostname = eapi.pcloud.com
+                  token = {"access_token":"<plex | jsonPath {.pcloud_token}>","token_type":"bearer","expiry":"0001-01-01T00:00:00Z"}
     - chart: plex-media-server
       repoURL: https://raw.githubusercontent.com/plexinc/pms-docker/gh-pages 
       targetRevision: 0.4.0
@@ -52,6 +63,11 @@ spec:
               cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
           pms:
             configExistingClaim: pvc-plex
+          rclone:
+            enabled: true
+            configSecret: pcloud
+            remotes:
+              - pcloud:/plex
           extraEnv:
             PLEX_CLAIM: <plex | jsonPath {.claim}>
   destination:
