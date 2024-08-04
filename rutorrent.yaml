@@ -6,46 +6,64 @@ metadata:
     avp.kubernetes.io/path: "secrets.sops"
 spec:
   project: default
-  source:
-    chart: rtorrent-rutorrent
-    repoURL: tccr.io/truecharts
-    targetRevision: 6.1.4
-    helm:
-      version: v3
-      valuesObject:
-        ingress:
-          main:
-            enabled: true
-            ingressClassName: nginx
-            annotations:
-              external-dns.alpha.kubernetes.io/hostname: <rutorrent | jsonPath {.url}>
-            hosts:
-              - host: <rutorrent | jsonPath {.url}>
-                paths:
-                  - path: /
-            tls:
-              - hosts:
-                  - <rutorrent | jsonPath {.url}>
-                certificateIssuer: letsencrypt-dns-prod
-        persistence:
-          data:
-            enabled: true
-            type: hostPath
-            mountPath: "/data"
-            hostPath: /mnt/kube/rutorrent/data
-            hostPathType: DirectoryOrCreate
-          downloads:
-            enabled: true
-            type: hostPath
-            mountPath: "/downloads"
-            hostPath: /mnt/kube/rutorrent/downloads
-            hostPathType: DirectoryOrCreate
-          passwd:
-            enabled: true
-            type: hostPath
-            mountPath: "/passwd"
-            hostPath: /mnt/kube/rutorrent/passwd
-            hostPathType: DirectoryOrCreate
+  sources:
+    - chart: k8s-resources
+      repoURL: https://charts.deliveryhero.io/
+      targetRevision: 0.6.6
+      helm:
+        version: v3
+        valuesObject:
+          Ingresses:
+            - name: rutorrent
+              fullnameOverride: rutorrent
+              ingressClassName: nginx
+              annotations:
+                external-dns.alpha.kubernetes.io/hostname: <rutorrent | jsonPath {.url}>
+                cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
+                nginx.ingress.kubernetes.io/auth-url: "https://<eas | jsonPath {.endpoint}>/verify?redirect_http_code=401&config_token_store_id=primary&config_token_id=github"
+                nginx.ingress.kubernetes.io/auth-signin: "https://<eas | jsonPath {.endpoint}>/nginx/auth-signin?rd=$auth_redirect"
+                nginx.ingress.kubernetes.io/configuration-snippet: |
+                  auth_request_set $auth_redirect $upstream_http_location;
+              rules:
+                - host: <rutorrent | jsonPath {.url}>
+                  http:
+                    paths:
+                      - path: /
+                        pathType: Prefix
+                        backend:
+                          service:
+                            name: rutorrent-rtorrent-rutorrent
+                            port: 
+                              number: 8080
+              tls:
+                 - secretName: rutorrent-tls
+                   hosts:
+                     - <rutorrent | jsonPath {.url}>
+    - chart: rtorrent-rutorrent
+      repoURL: tccr.io/truecharts
+      targetRevision: 6.1.4
+      helm:
+        version: v3
+        valuesObject:
+          persistence:
+            data:
+              enabled: true
+              type: hostPath
+              mountPath: "/data"
+              hostPath: /mnt/kube/rutorrent/data
+              hostPathType: DirectoryOrCreate
+            downloads:
+              enabled: true
+              type: hostPath
+              mountPath: "/downloads"
+              hostPath: /mnt/kube/rutorrent/downloads
+              hostPathType: DirectoryOrCreate
+            passwd:
+              enabled: true
+              type: hostPath
+              mountPath: "/passwd"
+              hostPath: /mnt/kube/rutorrent/passwd
+              hostPathType: DirectoryOrCreate
   destination:
     name: "in-cluster"
     namespace: rutorrent
