@@ -28,6 +28,7 @@ spec:
               var: EAS_CONFIG_TOKENS
         configTokens:
           github: <eas | jsonPath {.configTokenGithub}>
+          htpasswd: <eas | jsonPath {.configTokenHtpasswd}>
         ingress:
           enabled: true
           className: "nginx"
