@@ -13,6 +13,9 @@ spec:
     helm:
       version: v3
       valuesObject:
+        prometheus:
+          prometheusSpec:
+            serviceMonitorSelectorNilUsesHelmValues: false
         grafana:
           adminPassword: <grafana | jsonPath {.adminpassword}>
           ingress:
