@@ -63,6 +63,8 @@ spec:
               cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
           pms:
             configExistingClaim: pvc-plex
+          service:
+            type: NodePort
           rclone:
             enabled: true
             configSecret: pcloud
