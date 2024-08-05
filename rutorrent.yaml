@@ -20,10 +20,7 @@ spec:
               annotations:
                 external-dns.alpha.kubernetes.io/hostname: <rutorrent | jsonPath {.url}>
                 cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
-                nginx.ingress.kubernetes.io/auth-url: "https://<eas | jsonPath {.endpoint}>/verify?redirect_http_code=401&config_token_store_id=primary&config_token_id=github"
-                nginx.ingress.kubernetes.io/auth-signin: "https://<eas | jsonPath {.endpoint}>/nginx/auth-signin?rd=$auth_redirect"
-                nginx.ingress.kubernetes.io/configuration-snippet: |
-                  auth_request_set $auth_redirect $upstream_http_location;
+                nginx.ingress.kubernetes.io/auth-url: "https://<eas | jsonPath {.endpoint}>/verify?redirect_http_code=401&config_token_store_id=primary&config_token_id=htpasswd"
               rules:
                 - host: <rutorrent | jsonPath {.url}>
                   http:
