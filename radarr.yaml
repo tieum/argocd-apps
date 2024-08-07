@@ -52,6 +52,18 @@ spec:
               mountPath: "/config"
               hostPath: /mnt/kube/radarr/config
               hostPathType: DirectoryOrCreate
+            rootfolder:
+              enabled: true
+              type: hostPath
+              mountPath: "/pcloud"
+              hostPath: /mnt/pcloud
+              hostPathType: Directory
+            downloadscomplete:
+              enabled: true
+              type: hostPath
+              mountPath: "/downloads/complete"
+              hostPath: /mnt/kube/qbittorrent/downloads/complete
+              hostPathType: Directory
           portal:
             open:
               enabled: false
