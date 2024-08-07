@@ -45,6 +45,21 @@ spec:
       helm:
         version: v3
         valuesObject:
+          service:
+            torrent:
+              type: NodePort
+              nodePort: 31299
+              ports:
+                torrent:
+                  enabled: true
+                  port: 6881
+                  protocol: tcp
+                  nodePort: 31299
+                torrentupd:
+                  enabled: true
+                  port: 6881
+                  protocol: udp
+                  nodePort: 30609
           persistence:
             config:
               enabled: true
