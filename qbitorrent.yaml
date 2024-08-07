@@ -6,29 +6,61 @@ metadata:
     avp.kubernetes.io/path: "secrets.sops"
 spec:
   project: default
-  source:
-    chart: qbittorrent
-    repoURL: tccr.io/truecharts
-    targetRevision: 21.1.3
-    helm:
-      version: v3
-      valuesObject:
-        persistence:
-          config:
-            enabled: true
-            type: hostPath
-            mountPath: "/config"
-            hostPath: /mnt/kube/qbittorrent/config
-            hostPathType: DirectoryOrCreate
-          downloads:
-            enabled: true
-            type: hostPath
-            mountPath: "/downloads"
-            hostPath: /mnt/kube/qbittorrent/downloads
-            hostPathType: DirectoryOrCreate
-        portal:
-          open:
-            enabled: false
+  sources:
+    - chart: k8s-resources
+      repoURL: https://charts.deliveryhero.io/
+      targetRevision: 0.6.6
+      helm:
+        version: v3
+        valuesObject:
+          Ingresses:
+            - name: qbittorrent
+              fullnameOverride: qbittorrent
+              ingressClassName: nginx
+              annotations:
+                external-dns.alpha.kubernetes.io/hostname: <qbittorrent | jsonPath {.url}>
+                cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
+                nginx.ingress.kubernetes.io/auth-url: "https://<eas | jsonPath {.endpoint}>/verify?redirect_http_code=401&config_token_store_id=primary&config_token_id=github"
+                nginx.ingress.kubernetes.io/auth-signin: "https://<eas | jsonPath {.endpoint}>/nginx/auth-signin?rd=$auth_redirect"
+                nginx.ingress.kubernetes.io/configuration-snippet: |
+                  auth_request_set $auth_redirect $upstream_http_location;
+              rules:
+                - host: <qbittorrent | jsonPath {.url}>
+                  http:
+                    paths:
+                      - path: /
+                        pathType: Prefix
+                        backend:
+                          service:
+                            name: qbittorrent
+                            port: 
+                              number: 10095
+              tls:
+                 - secretName: qbittorrent-tls
+                   hosts:
+                     - <qbittorrent | jsonPath {.url}>
+    - chart: qbittorrent
+      repoURL: tccr.io/truecharts
+      targetRevision: 21.1.3
+      helm:
+        version: v3
+        valuesObject:
+          persistence:
+            config:
+              enabled: true
+              type: hostPath
+              mountPath: "/config"
+              hostPath: /mnt/kube/qbittorrent/config
+              hostPathType: DirectoryOrCreate
+            downloads:
+              enabled: true
+              type: hostPath
+              mountPath: "/downloads"
+              hostPath: /mnt/kube/qbittorrent/downloads
+              hostPathType: DirectoryOrCreate
+          portal:
+            open:
+              enabled: false
   destination:
     name: "in-cluster"
     namespace: qbittorrent
