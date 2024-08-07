@@ -20,6 +20,12 @@ spec:
             mountPath: "/config"
             hostPath: /mnt/kube/qbittorrent/config
             hostPathType: DirectoryOrCreate
+          downloads:
+            enabled: true
+            type: hostPath
+            mountPath: "/downloads"
+            hostPath: /mnt/kube/qbittorrent/downloads
+            hostPathType: DirectoryOrCreate
         portal:
           open:
             enabled: false
