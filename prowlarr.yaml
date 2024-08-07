@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: prowlarr
+  annotations:
+    avp.kubernetes.io/path: "secrets.sops"
+spec:
+  project: default
+  sources:
+    - chart: prowlarr
+      repoURL: tccr.io/truecharts
+      targetRevision: 18.3.1
+      helm:
+        version: v3
+        valuesObject:
+          persistence:
+            config:
+              enabled: true
+              type: hostPath
+              mountPath: "/config"
+              hostPath: /mnt/kube/prowlarr/config
+              hostPathType: DirectoryOrCreate
+          portal:
+            open:
+              enabled: false
+          updated: false
+  destination:
+    name: "in-cluster"
+    namespace: prowlarr
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=true
