@@ -1,0 +1,79 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: sonarr
+  annotations:
+    avp.kubernetes.io/path: "secrets.sops"
+spec:
+  project: default
+  sources:
+    - chart: k8s-resources
+      repoURL: https://charts.deliveryhero.io/
+      targetRevision: 0.6.6
+      helm:
+        version: v3
+        valuesObject:
+          Ingresses:
+            - name: sonarr
+              fullnameOverride: sonarr
+              ingressClassName: nginx
+              annotations:
+                external-dns.alpha.kubernetes.io/hostname: <sonarr | jsonPath {.url}>
+                cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
+                nginx.ingress.kubernetes.io/auth-url: "https://<eas | jsonPath {.endpoint}>/verify?redirect_http_code=401&config_token_store_id=primary&config_token_id=github"
+                nginx.ingress.kubernetes.io/auth-signin: "https://<eas | jsonPath {.endpoint}>/nginx/auth-signin?rd=$auth_redirect"
+                nginx.ingress.kubernetes.io/configuration-snippet: |
+                  auth_request_set $auth_redirect $upstream_http_location;
+              rules:
+                - host: <sonarr | jsonPath {.url}>
+                  http:
+                    paths:
+                      - path: /
+                        pathType: Prefix
+                        backend:
+                          service:
+                            name: sonarr
+                            port: 
+                              number: 8989
+              tls:
+                 - secretName: sonarr-tls
+                   hosts:
+                     - <sonarr | jsonPath {.url}>
+    - chart: sonarr
+      repoURL: tccr.io/truecharts
+      targetRevision: 23.1.4
+      helm:
+        version: v3
+        valuesObject:
+          persistence:
+            config:
+              enabled: true
+              type: hostPath
+              mountPath: "/config"
+              hostPath: /mnt/kube/sonarr/config
+              hostPathType: DirectoryOrCreate
+            rootfolder:
+              enabled: true
+              type: hostPath
+              mountPath: "/pcloud"
+              hostPath: /mnt/pcloud
+              hostPathType: Directory
+            downloadscomplete:
+              enabled: true
+              type: hostPath
+              mountPath: "/downloads/complete"
+              hostPath: /mnt/kube/qbittorrent/downloads/complete
+              hostPathType: Directory
+          portal:
+            open:
+              enabled: false
+          updated: false
+  destination:
+    name: "in-cluster"
+    namespace: sonarr
+  syncPolicy:
+    automated: {}
+    syncOptions:
+    - CreateNamespace=true
+    - ApplyOutOfSyncOnly=true
+    - ServerSideApply=true
