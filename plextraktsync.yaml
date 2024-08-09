@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: plextraktsync
+  annotations:
+    avp.kubernetes.io/path: "secrets.sops"
+spec:
+  project: default
+  sources:
+    - chart: plextraktsync
+      repoURL: tccr.io/truecharts
+      targetRevision: 9.2.5
+      helm:
+        version: v3
+        valuesObject:
+          plextraktsync:
+            task: "--sync all"
+          persistence:
+            config:
+              enabled: true
+              type: hostPath
+              mountPath: "/app/config"
+              hostPath: /mnt/kube/plextraktsync/config
+              hostPathType: DirectoryOrCreate
+          portal:
+            open:
+              enabled: false
+  destination:
+    name: "in-cluster"
+    namespace: plextraktsync
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=true
