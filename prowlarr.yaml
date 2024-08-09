@@ -60,5 +60,7 @@ spec:
     name: "in-cluster"
     namespace: prowlarr
   syncPolicy:
+    automated: {}
     syncOptions:
     - CreateNamespace=true
+    - ApplyOutOfSyncOnly=true

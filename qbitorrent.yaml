@@ -80,5 +80,8 @@ spec:
     name: "in-cluster"
     namespace: qbittorrent
   syncPolicy:
+    automated: {}
     syncOptions:
     - CreateNamespace=true
+    - ApplyOutOfSyncOnly=true
+    - ServerSideApply=true

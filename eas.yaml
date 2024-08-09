@@ -48,5 +48,7 @@ spec:
     name: "in-cluster"
     namespace: eas 
   syncPolicy:
+    automated: {}
     syncOptions:
     - CreateNamespace=true
+    - ApplyOutOfSyncOnly=true

@@ -77,5 +77,8 @@ spec:
     name: "in-cluster"
     namespace: cert-manager
   syncPolicy:
+    automated: {}
     syncOptions:
     - CreateNamespace=true
+    - ApplyOutOfSyncOnly=true
+    - ServerSideApply=true

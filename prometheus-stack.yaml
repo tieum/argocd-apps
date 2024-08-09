@@ -54,6 +54,8 @@ spec:
     name: "in-cluster"
     namespace: prometheus
   syncPolicy:
+    automated: {}
     syncOptions:
     - CreateNamespace=true
+    - ApplyOutOfSyncOnly=true
     - ServerSideApply=true

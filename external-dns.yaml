@@ -26,5 +26,8 @@ spec:
     name: "in-cluster"
     namespace: external-dns
   syncPolicy:
+    automated: {}
     syncOptions:
     - CreateNamespace=true
+    - ApplyOutOfSyncOnly=true
+    - ServerSideApply=true

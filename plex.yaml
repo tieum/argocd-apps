@@ -76,5 +76,8 @@ spec:
     name: "in-cluster"
     namespace: plex
   syncPolicy:
+    automated: {}
     syncOptions:
     - CreateNamespace=true
+    - ApplyOutOfSyncOnly=true
+    - ServerSideApply=true

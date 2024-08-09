@@ -72,5 +72,8 @@ spec:
     name: "in-cluster"
     namespace: radarr
   syncPolicy:
+    automated: {}
     syncOptions:
     - CreateNamespace=true
+    - ApplyOutOfSyncOnly=true
+    - ServerSideApply=true
