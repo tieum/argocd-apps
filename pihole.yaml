@@ -31,10 +31,25 @@ spec:
       helm:
         version: v3
         valuesObject:
+          securityContext:
+            container:
+              capabilities:
+                add:
+                  - NET_ADMIN
+                  - SETFCAP
+                  - SETPCAP
+                  - KILL
+                  - NET_RAW
           workload:
             main:
               podSpec:
                 nodeName: nuc
+          service:
+            dns:
+              annotations:
+                tailscale.com/expose: "true"
+              externalIPs:
+                - 192.168.1.100
           persistence:
             config:
               enabled: true
