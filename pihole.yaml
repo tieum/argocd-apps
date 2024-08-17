@@ -1,0 +1,43 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: pihole
+  annotations:
+    avp.kubernetes.io/path: "secrets.sops"
+spec:
+  project: default
+  sources:
+    - chart: pihole
+      repoURL: tccr.io/truecharts
+      targetRevision: 18.3.0
+      helm:
+        version: v3
+        valuesObject:
+          workload:
+            main:
+              podSpec:
+                nodeName: nuc
+          persistence:
+            config:
+              enabled: true
+              type: hostPath
+              mountPath: "/etc/pihole"
+              hostPath: /mnt/kube/pihole/config
+              hostPathType: DirectoryOrCreate
+            dnsmasq:
+              enabled: true
+              type: hostPath
+              mountPath: "/etc/dnsmasq.d"
+              hostPath: /mnt/kube/pihole/dnsmasq.d
+              hostPathType: DirectoryOrCreate
+          portal:
+            open:
+              enabled: false
+  destination:
+    name: "in-cluster"
+    namespace: pihole
+  syncPolicy:
+    automated: {}
+    syncOptions:
+    - CreateNamespace=true
+    - ApplyOutOfSyncOnly=true
