@@ -7,6 +7,24 @@ metadata:
 spec:
   project: default
   sources:
+    - chart: k8s-resources
+      repoURL: https://charts.deliveryhero.io/
+      targetRevision: 0.6.6
+      helm:
+        version: v3
+        valuesObject:
+          Ingresses:
+            - name: pihole
+              fullnameOverride: pihole
+              ingressClassName: tailscale
+              defaultBackend:
+                service:
+                  name: pihole
+                  port:
+                    number: 9089
+              tls:
+                 - hosts:
+                     - pihole
     - chart: pihole
       repoURL: tccr.io/truecharts
       targetRevision: 18.3.0
