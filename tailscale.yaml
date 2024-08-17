@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tailscale-operator
+  annotations:
+    avp.kubernetes.io/path: "secrets.sops"
+spec:
+  project: default
+  source:
+    chart: tailscale-operator
+    repoURL: https://pkgs.tailscale.com/helmcharts
+    targetRevision: 1.70.0
+    helm:
+      version: v3
+      valuesObject:
+        oauth:
+          clientId: <tailscale | jsonPath {.clientId}>
+          clientSecret: <tailscale | jsonPath {.clientSecret}>
+  destination:
+    name: "in-cluster"
+    namespace: tailscale
+  syncPolicy:
+    automated: {}
+    syncOptions:
+    - CreateNamespace=true
