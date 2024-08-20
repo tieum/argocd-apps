@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: flaresolverr
+  annotations:
+    avp.kubernetes.io/path: "secrets.sops"
+spec:
+  project: default
+  sources:
+    - chart: flaresolverr
+      repoURL: tccr.io/truecharts
+      targetRevision: 15.1.5
+      helm:
+        version: v3
+        valuesObject:
+          persistence:
+            config:
+              enabled: true
+              type: hostPath
+              mountPath: "/config"
+              hostPath: /mnt/kube/flaresolverr/config
+              hostPathType: DirectoryOrCreate
+          portal:
+            open:
+              enabled: false
+  destination:
+    name: "in-cluster"
+    namespace: flaresolverr
+  syncPolicy:
+    automated: {}
+    syncOptions:
+    - CreateNamespace=true
+    - ApplyOutOfSyncOnly=true
