@@ -13,6 +13,8 @@ spec:
       helm:
         version: v3
         valuesObject:
+          image:
+            tag: pr-1282
           persistence:
             config:
               enabled: true
