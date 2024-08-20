@@ -1,0 +1,94 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: immich
+  annotations:
+    avp.kubernetes.io/path: "secrets.sops"
+spec:
+  project: default
+  sources:
+    - chart: k8s-resources
+      repoURL: https://charts.deliveryhero.io/
+      targetRevision: 0.6.6
+      helm:
+        version: v3
+        valuesObject:
+          Ingresses:
+            - name: immich
+              fullnameOverride: immich
+              ingressClassName: nginx
+              annotations:
+                external-dns.alpha.kubernetes.io/hostname: <immich | jsonPath {.url}>
+                cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
+              rules:
+                - host: <immich | jsonPath {.url}>
+                  http:
+                    paths:
+                      - path: /
+                        pathType: Prefix
+                        backend:
+                          service:
+                            name: immich
+                            port:
+                              number: 10323
+              tls:
+                 - secretName: immich-tls
+                   hosts:
+                     - <immich | jsonPath {.url}>
+    - chart: immich
+      repoURL: tccr.io/truecharts
+      targetRevision: 17.6.2
+      helm:
+        version: v3
+        valuesObject:
+          cnpg:
+            main:
+              cluster:
+                  storage:
+                    size: 10Gi
+                    storageClass: local-path
+                  walStorage:
+                    size: 1Gi
+                    storageClass: local-path
+          persistence:
+            library:
+              enabled: true
+              type: hostPath
+              mountPath: /usr/src/app/upload/library
+              hostPath: /mnt/pcloud/immich/library
+              hostPathType: Directory
+            uploads:
+              enabled: true
+              type: hostPath
+              mountPath: /usr/src/app/upload/upload
+              hostPath: /mnt/pcloud/immich/upload
+              hostPathType: Directory
+            thumbs:
+              enabled: true
+              type: hostPath
+              mountPath: /usr/src/app/upload/thumbs
+              hostPath: /mnt/pcloud/immich/thumbs
+              hostPathType: Directory
+            profile:
+              enabled: true
+              type: hostPath
+              mountPath: /usr/src/app/upload/profile
+              hostPath: /mnt/pcloud/immich/profile
+              hostPathType: Directory
+            video:
+              enabled: true
+              type: hostPath
+              mountPath: /usr/src/app/upload/encoded-video
+              hostPath: /mnt/pcloud/immich/encoded-video
+              hostPathType: Directory
+          portal:
+            open:
+              enabled: false
+  destination:
+    name: "in-cluster"
+    namespace: immich
+  syncPolicy:
+    automated: {}
+    syncOptions:
+    - CreateNamespace=true
+    - ApplyOutOfSyncOnly=true
