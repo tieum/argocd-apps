@@ -47,17 +47,19 @@ spec:
         valuesObject:
           service:
             torrent:
+              enabled: true
               type: NodePort
-              nodePort: 31299
               ports:
                 torrent:
                   enabled: true
                   port: 6881
+                  targetPort: 6881
                   protocol: tcp
                   nodePort: 31299
-                torrentupd:
+                torrentudp:
                   enabled: true
                   port: 6881
+                  targetPort: 6881
                   protocol: udp
                   nodePort: 30609
           persistence:
