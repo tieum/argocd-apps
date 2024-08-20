@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cnpg
+  annotations:
+    avp.kubernetes.io/path: "secrets.sops"
+spec:
+  project: default
+  sources:
+    - chart: cloudnative-pg
+      repoURL: tccr.io/truecharts
+      targetRevision: 8.1.1
+  destination:
+    name: "in-cluster"
+    namespace: cnpg
+  syncPolicy:
+    automated: {}
+    syncOptions:
+    - CreateNamespace=true
+    - ApplyOutOfSyncOnly=true
+    - ServerSideApply=true
