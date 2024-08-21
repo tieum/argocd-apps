@@ -3,7 +3,7 @@ kind: Application
 metadata:
   name: plex
   annotations:
-    avp.kubernetes.io/path: "secrets.sops"
+    avp.kubernetes.io/path: "../secrets.sops.yaml"
 spec:
   project: default
   sources:
