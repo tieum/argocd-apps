@@ -58,6 +58,12 @@ spec:
               mountPath: "/config"
               hostPath: /mnt/kube/readarr/config
               hostPathType: DirectoryOrCreate
+            downloadscomplete:
+              enabled: true
+              type: hostPath
+              mountPath: "/downloads/complete"
+              hostPath: /mnt/kube/qbittorrent/downloads/complete
+              hostPathType: Directory
           portal:
             open:
               enabled: false
