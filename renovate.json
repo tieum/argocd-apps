@@ -1,0 +1,25 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "argocd": {
+    "fileMatch": [
+      "apps/.+\\.yaml$"
+    ]
+  },
+  "extends": [
+    "config:recommended"
+  ],
+  "packageRules": [
+    {
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "pin",
+        "digest"
+      ],
+      "automerge": true
+    }
+  ],
+  "automergeSchedule": [
+    "before 6am"
+  ]
+}
