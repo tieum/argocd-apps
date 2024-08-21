@@ -46,6 +46,12 @@ spec:
         version: v3
         valuesObject:
           persistence:
+            rootfolder:
+              enabled: true
+              type: hostPath
+              mountPath: "/pcloud"
+              hostPath: /mnt/pcloud
+              hostPathType: Directory
             config:
               enabled: true
               type: hostPath
