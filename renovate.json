@@ -21,5 +21,6 @@
   ],
   "automergeType": "pr",
   "ignoreTests": true,
-  "platformAutomerge": true
+  "platformAutomerge": true,
+  "automergeStrategy": "fast-forward"
 }
