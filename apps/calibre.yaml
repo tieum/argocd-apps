@@ -9,7 +9,7 @@ spec:
   sources:
     - chart: calibre
       repoURL: tccr.io/truecharts
-      targetRevision: 16.5.0
+      targetRevision: 16.5.1
       helm:
         version: v3
         valuesObject:
