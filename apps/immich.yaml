@@ -20,6 +20,7 @@ spec:
               annotations:
                 external-dns.alpha.kubernetes.io/hostname: <immich | jsonPath {.url}>
                 cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
+                nginx.ingress.kubernetes.io/proxy-body-size: 2G
               rules:
                 - host: <immich | jsonPath {.url}>
                   http:
