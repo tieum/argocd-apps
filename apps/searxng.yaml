@@ -1,0 +1,63 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: searxng
+  annotations:
+    avp.kubernetes.io/path: "../secrets.sops.yaml"
+spec:
+  project: default
+  sources:
+    - chart: k8s-resources
+      repoURL: https://charts.deliveryhero.io/
+      targetRevision: 0.6.6
+      helm:
+        version: v3
+        valuesObject:
+          Ingresses:
+            - name: searxng
+              fullnameOverride: searxng
+              ingressClassName: nginx
+              annotations:
+                external-dns.alpha.kubernetes.io/hostname: <searxng | jsonPath {.url}>
+                cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
+                nginx.ingress.kubernetes.io/proxy-buffering: "on"
+                nginx.ingress.kubernetes.io/proxy-buffer-size: "128k"
+              rules:
+                - host: <searxng | jsonPath {.url}>
+                  http:
+                    paths:
+                      - path: /
+                        pathType: Prefix
+                        backend:
+                          service:
+                            name: searxng
+                            port: 
+                              number: 8080
+              tls:
+                 - secretName: searxng-tls
+                   hosts:
+                     - <searxng | jsonPath {.url}>
+    - chart: searxng
+      repoURL: tccr.io/truecharts
+      targetRevision: 9.1.31
+      helm:
+        version: v3
+        valuesObject:
+          persistence:
+            config:
+              enabled: true
+              type: hostPath
+              mountPath: "/etc/searxng"
+              hostPath: /mnt/kube/searxng/config
+              hostPathType: DirectoryOrCreate
+          portal:
+            open:
+              enabled: false
+  destination:
+    name: "in-cluster"
+    namespace: searxng
+  syncPolicy:
+    automated: {}
+    syncOptions:
+    - CreateNamespace=true
+    - ApplyOutOfSyncOnly=true
