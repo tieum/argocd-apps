@@ -39,7 +39,7 @@ spec:
                      - <searxng | jsonPath {.url}>
     - chart: searxng
       repoURL: tccr.io/truecharts
-      targetRevision: 9.1.31
+      targetRevision: 9.1.32
       helm:
         version: v3
         valuesObject:
