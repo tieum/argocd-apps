@@ -9,7 +9,7 @@ spec:
   sources:
     - chart: plextraktsync
       repoURL: tccr.io/truecharts
-      targetRevision: 9.2.9
+      targetRevision: 9.2.10
       helm:
         version: v3
         valuesObject:
