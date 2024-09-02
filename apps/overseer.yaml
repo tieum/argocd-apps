@@ -37,7 +37,7 @@ spec:
                      - <overseerr | jsonPath {.url}>
     - chart: overseerr
       repoURL: tccr.io/truecharts
-      targetRevision: 15.1.3
+      targetRevision: 15.1.4
       helm:
         version: v3
         valuesObject:
