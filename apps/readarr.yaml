@@ -41,7 +41,7 @@ spec:
                      - <readarr | jsonPath {.url}>
     - chart: readarr
       repoURL: tccr.io/truecharts
-      targetRevision: 23.1.7
+      targetRevision: 23.1.8
       helm:
         version: v3
         valuesObject:
