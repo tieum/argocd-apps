@@ -41,7 +41,7 @@ spec:
                      - <prowlarr | jsonPath {.url}>
     - chart: prowlarr
       repoURL: tccr.io/truecharts
-      targetRevision: 18.5.0
+      targetRevision: 18.5.1
       helm:
         version: v3
         valuesObject:
