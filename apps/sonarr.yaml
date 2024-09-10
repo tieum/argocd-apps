@@ -41,7 +41,7 @@ spec:
                      - <sonarr | jsonPath {.url}>
     - chart: sonarr
       repoURL: tccr.io/truecharts
-      targetRevision: 23.1.8
+      targetRevision: 23.1.9
       helm:
         version: v3
         valuesObject:
