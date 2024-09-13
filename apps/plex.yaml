@@ -56,7 +56,7 @@ spec:
         valuesObject:
           image:
             repository: plexinc/pms-docker
-            tag: 1.40.5.8921-836b34c27
+            tag: 1.41.0.8992-8463ad060
           ingress:
             enabled: true
             url: <plex| jsonPath {.url}>
