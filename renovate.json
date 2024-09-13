@@ -17,6 +17,28 @@
         "digest"
       ],
       "automerge": true
+    },
+    {
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchPackageNames": [
+        "plexinc/**"
+      ],
+      "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)\\.(?<build>\\d+)-(?<revision>.*)?$"
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "docker tag within argo helm values",
+      "fileMatch": [
+        "^apps/.+\\.yaml$"
+      ],
+      "matchStrings": [
+        "repository: (?<depName>.*)\\s+tag: (?<currentValue>.*)\\s+"
+      ],
+      "datasourceTemplate": "docker"
     }
   ],
   "automergeType": "pr",
