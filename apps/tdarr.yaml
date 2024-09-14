@@ -1,0 +1,104 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tdarr
+  annotations:
+    avp.kubernetes.io/path: "../secrets.sops.yaml"
+spec:
+  project: default
+  sources:
+    - chart: k8s-resources
+      repoURL: https://charts.deliveryhero.io/
+      targetRevision: 0.6.6
+      helm:
+        version: v3
+        valuesObject:
+          Ingresses:
+            - name: tdarr
+              fullnameOverride: tdarr
+              ingressClassName: nginx
+              annotations:
+                external-dns.alpha.kubernetes.io/hostname: <tdarr | jsonPath {.url}>
+                cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
+                nginx.ingress.kubernetes.io/auth-url: "https://<eas | jsonPath {.endpoint}>/verify?redirect_http_code=401&config_token_store_id=primary&config_token_id=github"
+                nginx.ingress.kubernetes.io/auth-signin: "https://<eas | jsonPath {.endpoint}>/nginx/auth-signin?rd=$auth_redirect"
+                nginx.ingress.kubernetes.io/configuration-snippet: |
+                  auth_request_set $auth_redirect $upstream_http_location;
+              rules:
+                - host: <tdarr | jsonPath {.url}>
+                  http:
+                    paths:
+                      - path: /
+                        pathType: Prefix
+                        backend:
+                          service:
+                            name: tdarr
+                            port: 
+                              number: 8265
+              tls:
+                 - secretName: tdarr-tls
+                   hosts:
+                     - <tdarr | jsonPath {.url}>
+    - chart: tdarr
+      repoURL: tccr.io/truecharts
+      targetRevision: 11.7.0
+      helm:
+        version: v3
+        valuesObject:
+          workload:
+            main:
+              podSpec:
+                containers:
+                  main:
+                    env:
+                      auth: true
+                      apiKey: <tdarr | jsonPath {.apiKey}>
+                      serverIP: tdarr-comm.tdarr.svc.cluster.local
+          persistence:
+            configs:
+              enabled: true
+              type: hostPath
+              hostPathType: DirectoryOrCreate
+              mountPath: "/app/configs"
+              hostPath: /mnt/kube/tdarr/config
+            server:
+              enabled: true
+              type: hostPath
+              hostPathType: DirectoryOrCreate
+              mountPath: "/app/server"
+              hostPath: /mnt/kube/tdarr/server
+            logs:
+              enabled: true
+              type: hostPath
+              hostPathType: DirectoryOrCreate
+              mountPath: "/app/logs"
+              hostPath: /mnt/kube/tdarr/logs
+            transcode-cache:
+              enabled: true
+              type: hostPath
+              hostPathType: DirectoryOrCreate
+              mountPath: "/temp"
+              hostPath: /mnt/kube/tdarr/temp
+            media:
+              enabled: true
+              type: hostPath
+              hostPathType: DirectoryOrCreate
+              mountPath: "/media"
+              hostPath: /mnt/kube/tdarr/media
+            rootfolder:
+              enabled: true
+              type: hostPath
+              mountPath: "/pcloud"
+              hostPath: /mnt/pcloud
+              hostPathType: Directory
+          portal:
+            open:
+              enabled: false
+  destination:
+    name: "in-cluster"
+    namespace: tdarr
+  syncPolicy:
+    automated: {}
+    syncOptions:
+    - CreateNamespace=true
+    - ApplyOutOfSyncOnly=true
