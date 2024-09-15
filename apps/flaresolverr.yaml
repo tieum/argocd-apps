@@ -9,7 +9,7 @@ spec:
   sources:
     - chart: flaresolverr
       repoURL: tccr.io/truecharts
-      targetRevision: 15.1.7
+      targetRevision: 15.1.8
       helm:
         version: v3
         valuesObject:
