@@ -41,7 +41,7 @@ spec:
                      - <radarr | jsonPath {.url}>
     - chart: radarr
       repoURL: tccr.io/truecharts
-      targetRevision: 23.4.5
+      targetRevision: 23.4.6
       helm:
         version: v3
         valuesObject:
