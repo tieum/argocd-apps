@@ -38,7 +38,7 @@ spec:
                      - <qbittorrent | jsonPath {.url}>
     - chart: qbittorrent
       repoURL: tccr.io/truecharts
-      targetRevision: 21.1.10
+      targetRevision: 21.1.11
       helm:
         version: v3
         valuesObject:
