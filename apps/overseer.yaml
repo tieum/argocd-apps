@@ -7,6 +7,22 @@ metadata:
 spec:
   project: default
   sources:
+    - chart: overseerr
+      repoURL: tccr.io/truecharts
+      targetRevision: 15.1.6
+      helm:
+        version: v3
+        valuesObject:
+          persistence:
+            config:
+              enabled: true
+              type: pvc
+              storageClass: longhorn
+              size: 50Mi
+              mountPath: "/app/config"
+          portal:
+            open:
+              enabled: false
     - chart: k8s-resources
       repoURL: https://charts.deliveryhero.io/
       targetRevision: 0.6.6
@@ -35,22 +51,6 @@ spec:
                  - secretName: overseerr-tls
                    hosts:
                      - <overseerr | jsonPath {.url}>
-    - chart: overseerr
-      repoURL: tccr.io/truecharts
-      targetRevision: 15.1.6
-      helm:
-        version: v3
-        valuesObject:
-          persistence:
-            config:
-              enabled: true
-              type: hostPath
-              mountPath: "/app/config"
-              hostPath: /mnt/kube/overseerr/config
-              hostPathType: DirectoryOrCreate
-          portal:
-            open:
-              enabled: false
   destination:
     name: "in-cluster"
     namespace: overseerr
