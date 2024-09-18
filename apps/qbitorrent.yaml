@@ -7,35 +7,6 @@ metadata:
 spec:
   project: default
   sources:
-    - chart: k8s-resources
-      repoURL: https://charts.deliveryhero.io/
-      targetRevision: 0.6.6
-      helm:
-        version: v3
-        valuesObject:
-          Ingresses:
-            - name: qbittorrent
-              fullnameOverride: qbittorrent
-              ingressClassName: nginx
-              annotations:
-                external-dns.alpha.kubernetes.io/hostname: <qbittorrent | jsonPath {.url}>
-                cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
-                nginx.ingress.kubernetes.io/auth-url: "https://<eas | jsonPath {.endpoint}>/verify?redirect_http_code=401&config_token_store_id=primary&config_token_id=htpasswd"
-              rules:
-                - host: <qbittorrent | jsonPath {.url}>
-                  http:
-                    paths:
-                      - path: /
-                        pathType: Prefix
-                        backend:
-                          service:
-                            name: qbittorrent
-                            port: 
-                              number: 10095
-              tls:
-                 - secretName: qbittorrent-tls
-                   hosts:
-                     - <qbittorrent | jsonPath {.url}>
     - chart: qbittorrent
       repoURL: tccr.io/truecharts
       targetRevision: 21.1.11
@@ -62,19 +33,48 @@ spec:
           persistence:
             config:
               enabled: true
-              type: hostPath
+              type: pvc
+              storageClass: longhorn
+              size: 50Mi
               mountPath: "/config"
-              hostPath: /mnt/kube/qbittorrent/config
-              hostPathType: DirectoryOrCreate
             downloads:
               enabled: true
-              type: hostPath
+              type: pvc
+              storageClass: longhorn
+              size: 80Gi
               mountPath: "/downloads"
-              hostPath: /mnt/kube/qbittorrent/downloads
-              hostPathType: DirectoryOrCreate
           portal:
             open:
               enabled: false
+    - chart: k8s-resources
+      repoURL: https://charts.deliveryhero.io/
+      targetRevision: 0.6.6
+      helm:
+        version: v3
+        valuesObject:
+          Ingresses:
+            - name: qbittorrent
+              fullnameOverride: qbittorrent
+              ingressClassName: nginx
+              annotations:
+                external-dns.alpha.kubernetes.io/hostname: <qbittorrent | jsonPath {.url}>
+                cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
+                nginx.ingress.kubernetes.io/auth-url: "https://<eas | jsonPath {.endpoint}>/verify?redirect_http_code=401&config_token_store_id=primary&config_token_id=htpasswd"
+              rules:
+                - host: <qbittorrent | jsonPath {.url}>
+                  http:
+                    paths:
+                      - path: /
+                        pathType: Prefix
+                        backend:
+                          service:
+                            name: qbittorrent
+                            port:
+                              number: 10095
+              tls:
+                 - secretName: qbittorrent-tls
+                   hosts:
+                     - <qbittorrent | jsonPath {.url}>
   destination:
     name: "in-cluster"
     namespace: qbittorrent
