@@ -48,10 +48,10 @@ spec:
           persistence:
             config:
               enabled: true
-              type: hostPath
+              type: pvc
+              storageClass: longhorn
+              size: 1Gi
               mountPath: "/config"
-              hostPath: /mnt/kube/sonarr/config
-              hostPathType: DirectoryOrCreate
             rootfolder:
               enabled: true
               type: hostPath
