@@ -46,10 +46,10 @@ spec:
           persistence:
             config:
               enabled: true
-              type: hostPath
+              type: pvc
+              storageClass: longhorn
+              size: 10Mi
               mountPath: "/etc/searxng"
-              hostPath: /mnt/kube/searxng/config
-              hostPathType: DirectoryOrCreate
           portal:
             open:
               enabled: false
