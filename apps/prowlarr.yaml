@@ -7,6 +7,23 @@ metadata:
 spec:
   project: default
   sources:
+    - chart: prowlarr
+      repoURL: tccr.io/truecharts
+      targetRevision: 18.5.2
+      helm:
+        version: v3
+        valuesObject:
+          persistence:
+            config:
+              enabled: true
+              type: pvc
+              storageClass: longhorn
+              size: 400Mi
+              mountPath: "/config"
+          portal:
+            open:
+              enabled: false
+          updated: false
     - chart: k8s-resources
       repoURL: https://charts.deliveryhero.io/
       targetRevision: 0.6.6
@@ -39,23 +56,6 @@ spec:
                  - secretName: prowlarr-tls
                    hosts:
                      - <prowlarr | jsonPath {.url}>
-    - chart: prowlarr
-      repoURL: tccr.io/truecharts
-      targetRevision: 18.5.2
-      helm:
-        version: v3
-        valuesObject:
-          persistence:
-            config:
-              enabled: true
-              type: hostPath
-              mountPath: "/config"
-              hostPath: /mnt/kube/prowlarr/config
-              hostPathType: DirectoryOrCreate
-          portal:
-            open:
-              enabled: false
-          updated: false
   destination:
     name: "in-cluster"
     namespace: prowlarr
