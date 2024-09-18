@@ -47,10 +47,10 @@ spec:
               cluster:
                   storage:
                     size: 10Gi
-                    storageClass: local-path
+                    storageClass: longhorn
                   walStorage:
                     size: 1Gi
-                    storageClass: local-path
+                    storageClass: longhorn
           persistence:
             library:
               enabled: true
