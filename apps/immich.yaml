@@ -47,10 +47,10 @@ spec:
               cluster:
                   storage:
                     size: 10Gi
-                    storageClass: longhorn
+                    storageClass: nfs-client
                   walStorage:
                     size: 1Gi
-                    storageClass: longhorn
+                    storageClass: nfs-client
           persistence:
             library:
               enabled: true
