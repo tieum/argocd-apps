@@ -7,6 +7,22 @@ metadata:
 spec:
   project: default
   sources:
+    - chart: searxng
+      repoURL: tccr.io/truecharts
+      targetRevision: 9.1.47
+      helm:
+        version: v3
+        valuesObject:
+          persistence:
+            config:
+              enabled: true
+              type: pvc
+              storageClass: nfs-client
+              size: 10Mi
+              mountPath: "/etc/searxng"
+          portal:
+            open:
+              enabled: false
     - chart: k8s-resources
       repoURL: https://charts.deliveryhero.io/
       targetRevision: 0.6.6
@@ -37,22 +53,6 @@ spec:
                  - secretName: searxng-tls
                    hosts:
                      - <searxng | jsonPath {.url}>
-    - chart: searxng
-      repoURL: tccr.io/truecharts
-      targetRevision: 9.1.47
-      helm:
-        version: v3
-        valuesObject:
-          persistence:
-            config:
-              enabled: true
-              type: pvc
-              storageClass: longhorn
-              size: 10Mi
-              mountPath: "/etc/searxng"
-          portal:
-            open:
-              enabled: false
   destination:
     name: "in-cluster"
     namespace: searxng
