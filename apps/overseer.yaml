@@ -17,7 +17,7 @@ spec:
             config:
               enabled: true
               type: pvc
-              storageClass: longhorn
+              storageClass: nfs-client
               size: 50Mi
               mountPath: "/app/config"
           portal:
