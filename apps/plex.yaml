@@ -9,6 +9,33 @@ metadata:
 spec:
   project: default
   sources:
+    - chart: plex-media-server
+      repoURL: https://raw.githubusercontent.com/plexinc/pms-docker/gh-pages 
+      targetRevision: 0.4.0
+      helm:
+        version: v3
+        valuesObject:
+          image:
+            repository: plexinc/pms-docker
+            tag: 1.41.0.8992-8463ad060
+          ingress:
+            enabled: true
+            url: <plex| jsonPath {.url}>
+            ingressClassName: nginx
+            annotations:
+              external-dns.alpha.kubernetes.io/hostname: <plex | jsonPath {.url}>
+              cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
+          pms:
+            configExistingClaim: pvc-plex
+          service:
+            type: NodePort
+          rclone:
+            enabled: true
+            configSecret: pcloud
+            remotes:
+              - pcloud:/plex
+          extraEnv:
+            PLEX_CLAIM: <plex | jsonPath {.claim}>
     - chart: k8s-resources
       repoURL: https://charts.deliveryhero.io/
       targetRevision: 0.6.6
@@ -50,33 +77,6 @@ spec:
                   type = pcloud
                   hostname = eapi.pcloud.com
                   token = {"access_token":"<plex | jsonPath {.pcloud_token}>","token_type":"bearer","expiry":"0001-01-01T00:00:00Z"}
-    - chart: plex-media-server
-      repoURL: https://raw.githubusercontent.com/plexinc/pms-docker/gh-pages 
-      targetRevision: 0.4.0
-      helm:
-        version: v3
-        valuesObject:
-          image:
-            repository: plexinc/pms-docker
-            tag: 1.41.0.8992-8463ad060
-          ingress:
-            enabled: true
-            url: <plex| jsonPath {.url}>
-            ingressClassName: nginx
-            annotations:
-              external-dns.alpha.kubernetes.io/hostname: <plex | jsonPath {.url}>
-              cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
-          pms:
-            configExistingClaim: pvc-plex
-          service:
-            type: NodePort
-          rclone:
-            enabled: true
-            configSecret: pcloud
-            remotes:
-              - pcloud:/plex
-          extraEnv:
-            PLEX_CLAIM: <plex | jsonPath {.claim}>
   destination:
     name: "in-cluster"
     namespace: plex
