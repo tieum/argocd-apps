@@ -13,6 +13,9 @@ spec:
       helm:
         version: v3
         valuesObject:
+          podOptions:
+            nodeSelector:
+              zone: "cloud"
           service:
             torrent:
               enabled: true
@@ -34,15 +37,16 @@ spec:
             config:
               enabled: true
               type: pvc
-              storageClass: longhorn
+              storageClass: nfs-client 
               size: 50Mi
               mountPath: "/config"
             downloads:
               enabled: true
-              type: pvc
-              storageClass: longhorn
-              size: 80Gi
+              type: nfs 
+              server: <nfs | jsonPath {.server}>
+              path: <nfs | jsonPath {.path}>/qbittorrent-downloads
               mountPath: "/downloads"
+              accessModes: [ReadWriteMany]
           portal:
             open:
               enabled: false
