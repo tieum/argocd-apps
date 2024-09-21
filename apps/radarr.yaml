@@ -7,6 +7,36 @@ metadata:
 spec:
   project: default
   sources:
+    - chart: radarr
+      repoURL: tccr.io/truecharts
+      targetRevision: 23.4.6
+      helm:
+        version: v3
+        valuesObject:
+          persistence:
+            config:
+              enabled: true
+              type: pvc
+              storageClass: nfs-client
+              size: 1Gi
+              mountPath: "/config"
+            rootfolder:
+              enabled: true
+              type: hostPath
+              mountPath: "/pcloud"
+              hostPath: /mnt/pcloud
+              hostPathType: Directory
+            downloads:
+              enabled: true
+              type: nfs 
+              server: <nfs | jsonPath {.server}>
+              path: <nfs | jsonPath {.path}>/qbittorrent-downloads
+              mountPath: "/downloads"
+              accessModes: [ReadWriteMany]
+          portal:
+            open:
+              enabled: false
+          updated: false
     - chart: k8s-resources
       repoURL: https://charts.deliveryhero.io/
       targetRevision: 0.6.6
@@ -39,35 +69,6 @@ spec:
                  - secretName: radarr-tls
                    hosts:
                      - <radarr | jsonPath {.url}>
-    - chart: radarr
-      repoURL: tccr.io/truecharts
-      targetRevision: 23.4.6
-      helm:
-        version: v3
-        valuesObject:
-          persistence:
-            config:
-              enabled: true
-              type: pvc
-              storageClass: longhorn
-              size: 1Gi
-              mountPath: "/config"
-            rootfolder:
-              enabled: true
-              type: hostPath
-              mountPath: "/pcloud"
-              hostPath: /mnt/pcloud
-              hostPathType: Directory
-            downloadscomplete:
-              enabled: true
-              type: hostPath
-              mountPath: "/downloads/complete"
-              hostPath: /mnt/kube/qbittorrent/downloads/complete
-              hostPathType: Directory
-          portal:
-            open:
-              enabled: false
-          updated: false
   destination:
     name: "in-cluster"
     namespace: radarr
