@@ -4,6 +4,8 @@ metadata:
   name: prowlarr
   annotations:
     avp.kubernetes.io/path: "../secrets.sops.yaml"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   sources:
