@@ -15,6 +15,9 @@ spec:
       helm:
         version: v3
         valuesObject:
+          podOptions:
+            nodeSelector:
+              zone: "cloud"
           persistence:
             config:
               enabled: true
