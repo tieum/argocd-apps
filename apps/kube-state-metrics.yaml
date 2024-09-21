@@ -1,0 +1,56 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kube-state-metrics
+  annotations:
+    avp.kubernetes.io/path: "../secrets.sops.yaml"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    chart: kube-state-metrics
+    repoURL: https://prometheus-community.github.io/helm-charts
+    targetRevision: 5.25.1
+    helm:
+      version: v3
+      valuesObject:
+  destination:
+    name: "in-cluster"
+    namespace: kube-state-metrics
+  syncPolicy:
+    automated: {}
+    syncOptions:
+    - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: metric-servers
+  annotations:
+    avp.kubernetes.io/path: "../secrets.sops.yaml"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    chart: metrics-server
+    repoURL: https://kubernetes-sigs.github.io/metrics-server/
+    targetRevision: 3.12.1
+    helm:
+      version: v3
+      valuesObject:
+        args:
+          - --kubelet-insecure-tls
+        apiService:
+          insecureSkipTLSVerify: true
+  destination:
+    name: "in-cluster"
+    namespace: metrics-server
+  syncPolicy:
+    automated: {}
+    syncOptions:
+    - CreateNamespace=true
+---
+
+
