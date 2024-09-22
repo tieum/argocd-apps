@@ -62,6 +62,7 @@ spec:
       helm:
         version: v3
         valuesObject:
+          configVersion: 0.0.1
           groupName: <cert-manager | jsonPath {.groupname} >
           issuers:
             - name: letsencrypt-dns-prod
