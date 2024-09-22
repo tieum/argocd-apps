@@ -1,0 +1,71 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: uptime-kuma
+  annotations:
+    avp.kubernetes.io/path: "../secrets.sops.yaml"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  sources:
+    - chart: uptime-kuma
+      repoURL: tccr.io/truecharts
+      targetRevision: 12.1.6
+      helm:
+        version: v3
+        valuesObject:
+          podOptions:
+            nodeSelector:
+              zone: "cloud"
+          persistence:
+            config:
+              enabled: true
+              type: pvc
+              storageClass: nfs-client
+              size: 100Mi
+              mountPath: "/app/data"
+          portal:
+            open:
+              enabled: false
+          updated: false
+    - chart: k8s-resources
+      repoURL: https://charts.deliveryhero.io/
+      targetRevision: 0.6.6
+      helm:
+        version: v3
+        valuesObject:
+          Ingresses:
+            - name: uptime-kuma
+              fullnameOverride: uptime-kuma
+              ingressClassName: nginx
+              annotations:
+                external-dns.alpha.kubernetes.io/hostname: <uptime-kuma | jsonPath {.url}>
+                cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
+                nginx.ingress.kubernetes.io/auth-url: "https://<eas | jsonPath {.endpoint}>/verify?redirect_http_code=401&config_token_store_id=primary&config_token_id=github"
+                nginx.ingress.kubernetes.io/auth-signin: "https://<eas | jsonPath {.endpoint}>/nginx/auth-signin?rd=$auth_redirect"
+                nginx.ingress.kubernetes.io/configuration-snippet: |
+                  auth_request_set $auth_redirect $upstream_http_location;
+              rules:
+                - host: <uptime-kuma | jsonPath {.url}>
+                  http:
+                    paths:
+                      - path: /
+                        pathType: Prefix
+                        backend:
+                          service:
+                            name: uptime-kuma
+                            port: 
+                              number: 3001
+              tls:
+                 - secretName: uptime-kuma-tls
+                   hosts:
+                     - <uptime-kuma | jsonPath {.url}>
+  destination:
+    name: "in-cluster"
+    namespace: uptime-kuma
+  syncPolicy:
+    automated: {}
+    syncOptions:
+    - CreateNamespace=true
+    - ApplyOutOfSyncOnly=true
