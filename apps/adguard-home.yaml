@@ -31,15 +31,9 @@ spec:
               externalIPs:
                 - 192.168.1.101
             dns-https:
-              annotations:
-                tailscale.com/expose: "true"
-              externalIPs:
-                - 192.168.1.101
+              enabled: false
             dns-https-udp:
-              annotations:
-                tailscale.com/expose: "true"
-              externalIPs:
-                - 192.168.1.101
+              enabled: false
             dns-crypt:
               enabled: false
             dns-crypt-udp:
