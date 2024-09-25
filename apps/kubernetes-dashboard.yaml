@@ -1,0 +1,39 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kubernetes-dashboard
+  annotations:
+    avp.kubernetes.io/path: "../secrets.sops.yaml"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    chart: kubernetes-dashboard
+    repoURL: https://kubernetes.github.io/dashboard/
+    targetRevision: 7.6.1
+    helm:
+      version: v3
+      valuesObject:
+        app:
+          ingress:
+            enabled: true
+            hosts:
+             - <kubernetes-dashboard | jsonPath {.url}>
+            ingressClassName: nginx
+            annotations:
+              external-dns.alpha.kubernetes.io/hostname: <kubernetes-dashboard | jsonPath {.url}>
+              nginx.ingress.kubernetes.io/auth-url: "https://<eas | jsonPath {.endpoint}>/verify?redirect_http_code=401&config_token_store_id=primary&config_token_id=github"
+              nginx.ingress.kubernetes.io/auth-signin: "https://<eas | jsonPath {.endpoint}>/nginx/auth-signin?rd=$auth_redirect"
+              nginx.ingress.kubernetes.io/configuration-snippet: |
+                auth_request_set $auth_redirect $upstream_http_location;
+            issuer:
+              name: "letsencrypt-dns-prod"
+              scope: cluster
+  destination:
+    name: "in-cluster"
+    namespace: kubernetes-dashboard
+  syncPolicy:
+    automated: {}
+    syncOptions:
+    - CreateNamespace=true
