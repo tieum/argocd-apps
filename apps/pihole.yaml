@@ -15,6 +15,10 @@ spec:
       helm:
         version: v3
         valuesObject:
+          podOptions:
+            nodeSelector:
+              zone: home
+              nuc: "1"
           securityContext:
             container:
               capabilities:
@@ -24,10 +28,6 @@ spec:
                   - SETPCAP
                   - KILL
                   - NET_RAW
-          workload:
-            main:
-              podSpec:
-                nodeName: nuc
           service:
             dns:
               annotations:
