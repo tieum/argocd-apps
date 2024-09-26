@@ -33,7 +33,7 @@ spec:
             enabled: true
             configSecret: pcloud
             remotes:
-              - pcloud:/plex
+              - pcloud:/k8s
           extraEnv:
             PLEX_CLAIM: <plex | jsonPath {.claim}>
     - chart: k8s-resources
