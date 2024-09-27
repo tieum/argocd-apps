@@ -1,0 +1,106 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: slskd
+  annotations:
+    avp.kubernetes.io/path: "../secrets.sops.yaml"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  sources:
+    - chart: slskd
+      repoURL: tccr.io/truecharts
+      targetRevision: 2.1.10
+      helm:
+        version: v3
+        valuesObject:
+          workload:
+            main:
+              podSpec:
+                containers:
+                  main:
+                    env:
+                      SLSKD_SLSK_LISTEN_IP_ADDRESS: 0.0.0.0
+                      SLSKD_SLSK_LISTEN_PORT: 50300
+                      SLSKD_HTTP_PORT: 5030
+                      APP_DIR: "{{.Values.persistence.data.mountPath }}"
+                      SLSKD_SHARED_DIR: "{{.Values.persistence.share.mountPath }}"
+                      SLSKD_DOWNLOADS_DIR: "{{ .Values.persistence.complete.mountPath }}"
+                      SLSKD_INCOMPLETE_DIR: "{{ .Values.persistence.incomplete.mountPath }}"
+                      SLSKD_USERNAME: "<slskd | jsonPath {.username}>"
+                      SLSKD_PASSWORD: "<slskd | jsonPath {.password}>"
+                      SLSKD_SLSK_USERNAME: "<slskd | jsonPath {.username}>"
+                      SLSKD_SLSK_PASSWORD: "<slskd | jsonPath {.password}>"
+                      SLSKD_JWT_KEY:
+                        secretKeyRef:
+                          name: slskd-secrets
+                          key: SLSKD_JWT_KEY
+          persistence:
+            data:
+              enabled: true
+              type: pvc
+              storageClass: nfs-client
+              size: 100Mi
+              mountPath: "/app"
+            share:
+              enabled: true
+              type: pvc
+              storageClass: nfs-client
+              size: 10Gi
+              mountPath: "/share"
+            incomplete:
+              enabled: true
+              type: pvc
+              storageClass: nfs-client
+              size: 1Gi
+              mountPath: "/downloads/incomplete"
+            complete:
+              enabled: true
+              type: pvc
+              storageClass: nfs-client
+              size: 200Gi
+              mountPath: "/downloads/complete"
+          portal:
+            open:
+              enabled: false
+    - chart: k8s-resources
+      repoURL: https://charts.deliveryhero.io/
+      targetRevision: 0.6.6
+      helm:
+        version: v3
+        valuesObject:
+          Ingresses:
+            - name: slskd
+              fullnameOverride: slskd
+              ingressClassName: nginx
+              annotations:
+                external-dns.alpha.kubernetes.io/hostname: <slskd | jsonPath {.url}>
+                cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
+                nginx.ingress.kubernetes.io/auth-url: "https://<eas | jsonPath {.endpoint}>/verify?redirect_http_code=401&config_token_store_id=primary&config_token_id=github"
+                nginx.ingress.kubernetes.io/auth-signin: "https://<eas | jsonPath {.endpoint}>/nginx/auth-signin?rd=$auth_redirect"
+                nginx.ingress.kubernetes.io/configuration-snippet: |
+                  auth_request_set $auth_redirect $upstream_http_location;
+              rules:
+                - host: <slskd | jsonPath {.url}>
+                  http:
+                    paths:
+                      - path: /
+                        pathType: Prefix
+                        backend:
+                          service:
+                            name: slskd
+                            port: 
+                              number: 5030
+              tls:
+                 - secretName: slskd-tls
+                   hosts:
+                     - <slskd | jsonPath {.url}>
+  destination:
+    name: "in-cluster"
+    namespace: slskd
+  syncPolicy:
+    automated: {}
+    syncOptions:
+    - CreateNamespace=true
+    - ApplyOutOfSyncOnly=true
