@@ -57,10 +57,11 @@ spec:
               mountPath: "/downloads/incomplete"
             complete:
               enabled: true
-              type: pvc
-              storageClass: nfs-client
-              size: 200Gi
+              type: nfs 
+              server: <nfs | jsonPath {.server}>
+              path: <nfs | jsonPath {.path}>/slskd-downloads
               mountPath: "/downloads/complete"
+              accessModes: [ReadWriteMany]
           portal:
             open:
               enabled: false
