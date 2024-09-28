@@ -36,6 +36,10 @@ spec:
                         secretKeyRef:
                           name: slskd-secrets
                           key: SLSKD_JWT_KEY
+          securityContext:
+            pod:
+              fsGroup: 568
+              fsGroupChangePolicy: Always
           persistence:
             data:
               enabled: true
