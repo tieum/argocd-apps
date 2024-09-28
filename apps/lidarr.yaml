@@ -36,10 +36,17 @@ spec:
               hostPathType: Directory
             downloads:
               enabled: true
-              type: nfs 
+              type: nfs
               server: <nfs | jsonPath {.server}>
               path: <nfs | jsonPath {.path}>/qbittorrent-downloads
               mountPath: "/downloads"
+              accessModes: [ReadWriteMany]
+            slskd-downloads:
+              enabled: true
+              type: nfs
+              server: <nfs | jsonPath {.server}>
+              path: <nfs | jsonPath {.path}>/slskd-downloads
+              mountPath: "/slskd-downloads"
               accessModes: [ReadWriteMany]
           portal:
             open:
