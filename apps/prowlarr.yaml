@@ -22,6 +22,20 @@ spec:
               storageClass: nfs-client
               size: 400Mi
               mountPath: "/config"
+            resolv-conf-vol:
+              enabled: true
+              optional: true
+              type: configmap
+              objectName: resolv-conf
+              mountPath: /etc/resolv.conf
+              subPath: resolv.conf
+              readOnly: true
+          configmap:
+            resolv-conf:
+              enabled: true
+              data:
+                resolv.conf: |
+                  nameserver	1.1.1.1
           portal:
             open:
               enabled: false
