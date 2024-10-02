@@ -11,7 +11,7 @@ spec:
   sources:
     - chart: cloudnative-pg
       repoURL: tccr.io/truecharts
-      targetRevision: 8.1.1
+      targetRevision: 8.2.0
   destination:
     name: "in-cluster"
     namespace: cnpg
