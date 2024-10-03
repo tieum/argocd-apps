@@ -11,7 +11,7 @@ spec:
   sources:
     - chart: uptime-kuma
       repoURL: tccr.io/truecharts
-      targetRevision: 12.1.8
+      targetRevision: 12.2.0
       helm:
         version: v3
         valuesObject:
