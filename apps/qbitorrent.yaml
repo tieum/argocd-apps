@@ -15,6 +15,25 @@ spec:
       helm:
         version: v3
         valuesObject:
+          addons:
+            vpn:
+              type: gluetun
+              killSwitch: true
+              envList:
+                - name: VPN_SERVICE_PROVIDER
+                  value: protonvpn
+                - name: VPN_PORT_FORWARDING_PROVIDER
+                  value: protonvpn
+                - name: PORT_FORWARD_ONLY
+                  value: on
+                - name: VPN_TYPE
+                  value: wireguard
+                - name: WIREGUARD_PRIVATE_KEY
+                  value: <qbittorrent | jsonPath {.vpn.priv}> 
+          qbitportforward:
+            enabled: true
+            QBT_USERNAME: <qbittorrent | jsonPath {.user}>"
+            QBT_PASSWORD: <qbittorrent | jsonPath {.password}>"
           podOptions:
             nodeSelector:
               zone: "cloud"
