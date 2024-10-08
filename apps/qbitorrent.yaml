@@ -19,21 +19,24 @@ spec:
             vpn:
               type: gluetun
               killSwitch: true
+              excludedNetworks_IPv4:
+                - 10.10.0.0/16
+                - 10.96.0.0/12
               envList:
                 - name: VPN_SERVICE_PROVIDER
                   value: protonvpn
-                - name: VPN_PORT_FORWARDING_PROVIDER
-                  value: protonvpn
-                - name: PORT_FORWARD_ONLY
-                  value: on
-                - name: VPN_TYPE
-                  value: wireguard
-                - name: WIREGUARD_PRIVATE_KEY
-                  value: <qbittorrent | jsonPath {.vpn.priv}> 
+                - name: OPENVPN_USER
+                  value: <qbittorrent | jsonPath {.vpn.user}>
+                - name: OPENVPN_PASSWORD
+                  value: <qbittorrent | jsonPath {.vpn.password}>
+                - name:  VPN_PORT_FORWARDING
+                  value: on 
+                - name: SERVER_COUNTRIES
+                  value: France
           qbitportforward:
             enabled: true
-            QBT_USERNAME: <qbittorrent | jsonPath {.user}>"
-            QBT_PASSWORD: <qbittorrent | jsonPath {.password}>"
+            QBT_USERNAME: <qbittorrent | jsonPath {.user}>
+            QBT_PASSWORD: <qbittorrent | jsonPath {.password}>
           podOptions:
             nodeSelector:
               zone: "cloud"
