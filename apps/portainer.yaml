@@ -11,7 +11,7 @@ spec:
   source:
     chart: portainer
     repoURL: https://portainer.github.io/k8s/
-    targetRevision: 1.0.54
+    targetRevision: 1.0.55
     helm:
       version: v3
       valuesObject:
