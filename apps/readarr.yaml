@@ -56,16 +56,17 @@ spec:
               hostPathType: Directory
             config:
               enabled: true
-              type: hostPath
+              type: pvc
+              storageClass: nfs-client
+              size: 1Gi
               mountPath: "/config"
-              hostPath: /mnt/kube/readarr/config
-              hostPathType: DirectoryOrCreate
-            downloadscomplete:
+            downloads:
               enabled: true
-              type: hostPath
-              mountPath: "/downloads/complete"
-              hostPath: /mnt/kube/qbittorrent/downloads/complete
-              hostPathType: Directory
+              type: nfs
+              server: <nfs | jsonPath {.server}>
+              path: <nfs | jsonPath {.path}>/qbittorrent-downloads
+              mountPath: "/downloads"
+              accessModes: [ReadWriteMany]
           portal:
             open:
               enabled: false
