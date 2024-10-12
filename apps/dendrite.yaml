@@ -1,0 +1,71 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: dendrite
+  annotations:
+    avp.kubernetes.io/path: "../secrets.sops.yaml"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  sources:
+    - chart: dendrite
+      repoURL: https://matrix-org.github.io/dendrite/
+      targetRevision: 0.14.6
+      helm:
+        version: v3
+        valuesObject:
+          persistence:
+            storageClass: nfs-client
+          dendrite_config:
+            global:
+              server_name: <dendrite | jsonPath {.hostname}>
+              database:
+                connection_string: <dendrite | jsonPath {.dbconnection}>
+            client_api:
+             registration_disabled: true
+             registration_shared_secret: <dendrite | jsonPath {.registrationsecret}>
+          ingress:
+            enabled: true
+            className: nginx
+            annotations:
+              external-dns.alpha.kubernetes.io/hostname: https://<dendrite | jsonPath {.hostname}>
+              cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
+            hostName: <dendrite | jsonPath {.hostname}>
+            tls:
+               - secretName: dendrite-tls
+                 hosts:
+                  - <dendrite | jsonPath {.hostname}>
+    - chart: k8s-resources
+      repoURL: https://charts.deliveryhero.io/
+      targetRevision: 0.6.6
+      helm:
+        version: v3
+        valuesObject:
+          CustomResources:
+            - name: dendrite
+              fullnameOverride: dendrite
+              apiVersion: postgresql.cnpg.io/v1
+              kind: Cluster
+              spec:
+                affinity:
+                  podAntiAffinityType: preferred
+                bootstrap:
+                  initdb:
+                    database: dendrite
+                storage:
+                  pvcTemplate:
+                    accessModes:
+                    - ReadWriteOnce
+                    resources:
+                      requests:
+                        storage: 1Gi
+                    storageClassName: nfs-client
+  destination:
+    name: "in-cluster"
+    namespace: dendrite
+  syncPolicy:
+    automated: {}
+    syncOptions:
+    - CreateNamespace=true
+    - ApplyOutOfSyncOnly=true
