@@ -20,7 +20,7 @@ spec:
           dendrite_config:
             global:
               server_name: <dendrite | jsonPath {.hostname}>
-              well_known_client_name: https://<dendrite | jsonPath {.hostname}> 
+              well_known_client_name: https://<dendrite | jsonPath {.hostname}>
               database:
                 connection_string: <dendrite | jsonPath {.dbconnection}>
             client_api:
@@ -30,7 +30,7 @@ spec:
             enabled: true
             className: nginx
             annotations:
-              external-dns.alpha.kubernetes.io/hostname: https://<dendrite | jsonPath {.hostname}>
+              external-dns.alpha.kubernetes.io/hostname: <dendrite | jsonPath {.hostname}>
               cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
             hostName: <dendrite | jsonPath {.hostname}>
             tls:
