@@ -27,6 +27,37 @@ spec:
                   walStorage:
                     size: 1Gi
                     storageClass: longhorn
+          workload:
+            main:
+              podSpec:
+                containers:
+                  main:
+                    env:
+                      RADARR__APP__INSTANCENAME: Radarr
+                      RADARR__APP__LAUNCHBROWSER: True
+                      RADARR__APP__THEME: dark
+                      RADARR__AUTH__APIKEY: <radarr | jsonPath {.apiKey}>
+                      RADARR__AUTH__METHOD: Forms
+                      RADARR__AUTH__REQUIRED: Enabled
+                      RADARR__LOG__ANALYTICS_ENABLED: False
+                      RADARR__LOG__DBENABLED: False
+                      RADARR__LOG__LEVEL: info
+                      RADARR__POSTGRES__HOST: radarr-cnpg-main-rw
+                      RADARR__POSTGRES__MAINDB: radarr
+                      RADARR__POSTGRES__PASSWORD: <radarr | jsonPath {.dbPassword}>
+                      RADARR__POSTGRES__PORT: 5432
+                      RADARR__POSTGRES__USER: postgres
+                      RADARR__SERVER__BINDADDRESS: "*"
+                      RADARR__SERVER__ENABLESSL: False
+                      RADARR__UPDATE__MECHANISM: Docker
+                      RADARR__SERVER__PORT: 7878
+                      RADARR__SERVER__SSLCERTPATH: ""
+                      RADARR__SERVER__SSLCERTPASSWORD: ""
+                      RADARR__SERVER__SSLPORT: 9898
+                      RADARR__SERVER__URLBASE: ""
+                  exportarr:
+                    env:
+                      APIKEY: <radarr | jsonPath {.apiKey}>
           persistence:
             config:
               enabled: true
