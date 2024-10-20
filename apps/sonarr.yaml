@@ -27,6 +27,37 @@ spec:
                   walStorage:
                     size: 1Gi
                     storageClass: longhorn
+          workload:
+            main:
+              podSpec:
+                containers:
+                  main:
+                    env:
+                      SONARR__APP__INSTANCENAME: Sonarr
+                      SONARR__APP__LAUNCHBROWSER: True
+                      SONARR__APP__THEME: dark
+                      SONARR__AUTH__APIKEY: <sonarr | jsonPath {.apiKey}>
+                      SONARR__AUTH__METHOD: Forms
+                      SONARR__AUTH__REQUIRED: Enabled
+                      SONARR__LOG__ANALYTICS_ENABLED: False
+                      SONARR__LOG__DBENABLED: False
+                      SONARR__LOG__LEVEL: info
+                      SONARR__POSTGRES__HOST: sonarr-cnpg-main-rw
+                      SONARR__POSTGRES__MAINDB: sonarr
+                      SONARR__POSTGRES__PASSWORD: <sonarr | jsonPath {.dbPassword}>
+                      SONARR__POSTGRES__PORT: 5432
+                      SONARR__POSTGRES__USER: postgres
+                      SONARR__SERVER__BINDADDRESS: "*"
+                      SONARR__SERVER__ENABLESSL: False
+                      SONARR__UPDATE__MECHANISM: Docker
+                      SONARR__SERVER__PORT: 8989
+                      SONARR__SERVER__SSLCERTPATH: ""
+                      SONARR__SERVER__SSLCERTPASSWORD: ""
+                      SONARR__SERVER__SSLPORT: 9898
+                      SONARR__SERVER__URLBASE: ""
+                  exportarr:
+                    env:
+                      APIKEY: <sonarr | jsonPath {.apiKey}>
           persistence:
             config:
               enabled: true
