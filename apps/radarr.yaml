@@ -67,10 +67,11 @@ spec:
               mountPath: "/config"
             rootfolder:
               enabled: true
-              type: hostPath
-              mountPath: "/pcloud"
-              hostPath: /mnt/pcloud
-              hostPathType: Directory
+              type: nfs
+              server: <nfs | jsonPath {.ip}>
+              path: <nfs | jsonPath {.mountpoint}>/movies
+              mountPath: "/movies"
+              accessModes: [ReadWriteMany]
             downloads:
               enabled: true
               type: nfs
