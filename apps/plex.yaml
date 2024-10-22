@@ -10,7 +10,7 @@ spec:
   project: default
   sources:
     - chart: plex-media-server
-      repoURL: https://raw.githubusercontent.com/plexinc/pms-docker/gh-pages 
+      repoURL: https://raw.githubusercontent.com/plexinc/pms-docker/gh-pages
       targetRevision: 0.4.0
       helm:
         version: v3
@@ -36,6 +36,16 @@ spec:
               - pcloud:/k8s
           extraEnv:
             PLEX_CLAIM: <plex | jsonPath {.claim}>
+            PLEX_UID: 568
+            PLEX_GID: 568
+          extraVolumes:
+            - name: movies
+              nfs:
+                server: <nfs | jsonPath {.ip}>
+                path: <nfs | jsonPath {.mountpoint}>/movies
+          extraVolumeMounts:
+            - name: movies
+              mountPath: /movies
     - chart: k8s-resources
       repoURL: https://charts.deliveryhero.io/
       targetRevision: 0.6.6
