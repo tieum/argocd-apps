@@ -29,11 +29,6 @@ spec:
             configExistingClaim: pvc-plex
           service:
             type: NodePort
-          rclone:
-            enabled: true
-            configSecret: pcloud
-            remotes:
-              - pcloud:/k8s
           extraEnv:
             PLEX_CLAIM: <plex | jsonPath {.claim}>
             PLEX_UID: 568
@@ -88,17 +83,6 @@ spec:
                resources:
                   requests:
                     storage: 2Gi
-          Secrets:
-            - name: pcloud
-              fullnameOverride: "pcloud"
-              annotations: {}
-              extraLabels: {}
-              b64Keys:
-                rclone.conf: |
-                  [pcloud]
-                  type = pcloud
-                  hostname = eapi.pcloud.com
-                  token = {"access_token":"<plex | jsonPath {.pcloud_token}>","token_type":"bearer","expiry":"0001-01-01T00:00:00Z"}
   destination:
     name: "in-cluster"
     namespace: plex
