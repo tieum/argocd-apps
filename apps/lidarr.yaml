@@ -30,10 +30,11 @@ spec:
                     readOnly: true
             rootfolder:
               enabled: true
-              type: hostPath
-              mountPath: "/pcloud"
-              hostPath: /mnt/pcloud
-              hostPathType: Directory
+              type: nfs
+              server: <nfs | jsonPath {.ip}>
+              path: <nfs | jsonPath {.mountpoint}>/music
+              mountPath: "/music"
+              accessModes: [ReadWriteMany]
             downloads:
               enabled: true
               type: nfs
@@ -78,7 +79,7 @@ spec:
                         backend:
                           service:
                             name: lidarr
-                            port: 
+                            port:
                               number: 8686
               tls:
                  - secretName: lidarr-tls
