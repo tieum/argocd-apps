@@ -43,9 +43,21 @@ spec:
               nfs:
                 server: <nfs | jsonPath {.ip}>
                 path: <nfs | jsonPath {.mountpoint}>/movies
+            - name: tv
+              nfs:
+                server: <nfs | jsonPath {.ip}>
+                path: <nfs | jsonPath {.mountpoint}>/tv
+            - name: music
+              nfs:
+                server: <nfs | jsonPath {.ip}>
+                path: <nfs | jsonPath {.mountpoint}>/music
           extraVolumeMounts:
             - name: movies
               mountPath: /movies
+            - name: tv
+              mountPath: /tv
+            - name: music
+              mountPath: /music
     - chart: k8s-resources
       repoURL: https://charts.deliveryhero.io/
       targetRevision: 0.6.6
