@@ -34,25 +34,13 @@ spec:
             PLEX_UID: 568
             PLEX_GID: 568
           extraVolumes:
-            - name: movies
+            - name: servarr
               nfs:
                 server: <nfs | jsonPath {.ip}>
-                path: <nfs | jsonPath {.mountpoint}>/movies
-            - name: tv
-              nfs:
-                server: <nfs | jsonPath {.ip}>
-                path: <nfs | jsonPath {.mountpoint}>/tv
-            - name: music
-              nfs:
-                server: <nfs | jsonPath {.ip}>
-                path: <nfs | jsonPath {.mountpoint}>/music
+                path: <nfs | jsonPath {.mountpoint}>
           extraVolumeMounts:
-            - name: movies
-              mountPath: /movies
-            - name: tv
-              mountPath: /tv
-            - name: music
-              mountPath: /music
+            - name: servarr
+              mountPath: /servarr
     - chart: k8s-resources
       repoURL: https://charts.deliveryhero.io/
       targetRevision: 0.6.6
