@@ -32,7 +32,7 @@ spec:
                 - name: OPENVPN_PASSWORD
                   value: <qbittorrent | jsonPath {.vpn.password}>
                 - name:  VPN_PORT_FORWARDING
-                  value: on 
+                  value: on
                 - name: SERVER_COUNTRIES
                   value: France
           qbitportforward:
@@ -52,26 +52,24 @@ spec:
                   port: 6881
                   targetPort: 6881
                   protocol: tcp
-                  nodePort: 31299
                 torrentudp:
                   enabled: true
                   port: 6881
                   targetPort: 6881
                   protocol: udp
-                  nodePort: 30609
           persistence:
             config:
               enabled: true
               type: pvc
-              storageClass: nfs-client 
+              storageClass: nfs-client
               size: 50Mi
               mountPath: "/config"
-            downloads:
+            servarr:
               enabled: true
-              type: nfs 
-              server: <nfs | jsonPath {.server}>
-              path: <nfs | jsonPath {.path}>/qbittorrent-downloads
-              mountPath: "/downloads"
+              type: nfs
+              server: <nfs | jsonPath {.ip}>
+              path: <nfs | jsonPath {.mountpoint}>
+              mountPath: "/servarr"
               accessModes: [ReadWriteMany]
           portal:
             open:

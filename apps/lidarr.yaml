@@ -28,19 +28,12 @@ spec:
                   exportarr:
                     mountPath: /config
                     readOnly: true
-            rootfolder:
+            servarr:
               enabled: true
               type: nfs
               server: <nfs | jsonPath {.ip}>
-              path: <nfs | jsonPath {.mountpoint}>/music
-              mountPath: "/music"
-              accessModes: [ReadWriteMany]
-            downloads:
-              enabled: true
-              type: nfs
-              server: <nfs | jsonPath {.server}>
-              path: <nfs | jsonPath {.path}>/qbittorrent-downloads
-              mountPath: "/downloads"
+              path: <nfs | jsonPath {.mountpoint}>
+              mountPath: "/servarr"
               accessModes: [ReadWriteMany]
             slskd-downloads:
               enabled: true
