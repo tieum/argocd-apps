@@ -15,6 +15,21 @@ spec:
       helm:
         version: v3
         valuesObject:
+          image:
+            repository: ghcr.io/hotio/lidarr
+            tag: pr-plugins
+          workload:
+            main:
+              podSpec:
+                containers:
+                  main:
+                    securityContext:
+                      readOnlyRootFilesystem: false
+                      runAsNonRoot: false
+                      runAsUser: 0
+                      runAsGroup: 0
+                    fixedEnv:
+                      S6_READ_ONLY_ROOT: 1
           persistence:
             config:
               enabled: true
