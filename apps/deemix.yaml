@@ -1,0 +1,50 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: deemix
+  annotations:
+    avp.kubernetes.io/path: "../secrets.sops.yaml"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    chart: onechart
+    repoURL: https://chart.onechart.dev
+    targetRevision: 0.73.0
+    helm:
+      version: v3
+      valuesObject:
+        image:
+          repository: codefaux/deemix-for-lidarr
+          tag: latest
+        containerPort: 6595
+        podSpec:
+          volumes:
+            - name: servarr
+              nfs:
+                server: <nfs | jsonPath {.ip}>
+                path: <nfs | jsonPath {.mountpoint}>
+            - name: config
+              persistentVolumeClaim:
+                claimName: deemix-config
+        containers:
+          volumeMounts:
+            - mountPath: /servarr
+              name: servarr
+            - mountPath: /deemix-gui/config
+              name: config
+        volumes:
+          - name: config
+            size: 300Mi
+            path: /deemix-gui/config
+            storageClass: nfs-client
+
+  destination:
+    name: "in-cluster"
+    namespace: deemix
+  syncPolicy:
+    automated: {}
+    syncOptions:
+    - CreateNamespace=true
+    - ApplyOutOfSyncOnly=true
