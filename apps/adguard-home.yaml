@@ -11,7 +11,7 @@ spec:
   sources:
     - chart: adguard-home
       repoURL: tccr.io/truecharts
-      targetRevision: 11.2.1
+      targetRevision: 11.2.2
       helm:
         version: v3
         valuesObject:
