@@ -8,38 +8,59 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
-  source:
-    chart: onechart
-    repoURL: https://chart.onechart.dev
-    targetRevision: 0.73.0
-    helm:
-      version: v3
-      valuesObject:
-        image:
-          repository: codefaux/deemix-for-lidarr
-          tag: latest
-        containerPort: 6595
-        podSpec:
-          volumes:
-            - name: servarr
-              nfs:
-                server: <nfs | jsonPath {.ip}>
-                path: <nfs | jsonPath {.mountpoint}>
-            - name: config
-              persistentVolumeClaim:
-                claimName: deemix-config
-        containers:
-          volumeMounts:
-            - mountPath: /servarr
-              name: servarr
-            - mountPath: /deemix-gui/config
-              name: config
-        volumes:
-          - name: config
-            size: 300Mi
-            path: /deemix-gui/config
-            storageClass: nfs-client
-
+  sources:
+    - chart: deemix
+      repoURL: tccr.io/truecharts
+      targetRevision: 12.2.1
+      helm:
+        version: v3
+        valuesObject:
+          image:
+            repository: codefaux/deemix-for-lidarr
+            tag: latest
+          addons:
+            vpn:
+              type: gluetun
+              killSwitch: true
+              excludedNetworks_IPv4:
+                - 10.10.0.0/16
+                - 10.96.0.0/12
+              inputPorts:
+                - 6595
+              envList:
+                - name: VPN_SERVICE_PROVIDER
+                  value: protonvpn
+                - name: OPENVPN_USER
+                  value: <deemix| jsonPath {.vpn.user}>
+                - name: OPENVPN_PASSWORD
+                  value: <deemix| jsonPath {.vpn.password}>
+                - name: SERVER_COUNTRIES
+                  value: France
+          persistence:
+            config:
+              enabled: true
+              type: pvc
+              storageClass: longhorn
+              size: 300Mi
+              mountPath: "/deemix-gui/config"
+            data:
+              enabled: true
+              type: nfs
+              server: <nfs | jsonPath {.ip}>
+              path: <nfs | jsonPath {.mountpoint}>
+              mountPath: "/servarr"
+              accessModes: [ReadWriteMany]
+          workload:
+            main:
+              podSpec:
+                containers:
+                  main:
+                    env:
+                      INTPORT: "{{ .Values.service.main.ports.main.targetPort }}"
+                      DEEMIX_SINGLE_USER: true
+          portal:
+            open:
+              enabled: false
   destination:
     name: "in-cluster"
     namespace: deemix
