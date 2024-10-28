@@ -47,6 +47,11 @@ spec:
                       runAsGroup: 0
                     fixedEnv:
                       S6_READ_ONLY_ROOT: 1
+                  exportarr:
+                    env:
+                      APIKEY: <lidarr | jsonPath {.apiKey}>
+                      CONFIG: ""
+                      ENABLE_ADDITIONAL_METRICS: true
           persistence:
             config:
               enabled: true
