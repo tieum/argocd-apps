@@ -58,6 +58,7 @@ spec:
                   exportarr:
                     env:
                       APIKEY: <sonarr | jsonPath {.apiKey}>
+                      CONFIG: ""
           persistence:
             config:
               enabled: true
