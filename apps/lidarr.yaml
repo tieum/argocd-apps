@@ -23,6 +23,23 @@ spec:
               podSpec:
                 containers:
                   main:
+                    probes:
+                      liveness:
+                        enabled: true
+                        type: http
+                        path: /ping
+                        spec:
+                          initialDelaySeconds: 60
+                          periodSeconds: 20
+                          timeoutSeconds: 15
+                          failureThreshold: 10
+                          successThreshold: 1
+                      readiness:
+                        enabled: false
+                      startup:
+                        enabled: true
+                        type: http
+                        path: /ping
                     securityContext:
                       readOnlyRootFilesystem: false
                       runAsNonRoot: false
