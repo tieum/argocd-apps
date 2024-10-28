@@ -18,6 +18,16 @@ spec:
         prometheus:
           prometheusSpec:
             serviceMonitorSelectorNilUsesHelmValues: false
+            containers:
+            - name: graphite-exporter
+              image: prom/graphite-exporter
+              ports:
+              - containerPort: 9108
+                name: metrics
+                protocol: TCP
+              - containerPort: 9109
+                name: graphite
+                protocol: TCP
           ingress:
             enabled: true
             ingressClassName: nginx
