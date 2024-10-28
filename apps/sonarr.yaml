@@ -59,6 +59,7 @@ spec:
                     env:
                       APIKEY: <sonarr | jsonPath {.apiKey}>
                       CONFIG: ""
+                      ENABLE_ADDITIONAL_METRICS: true
           persistence:
             config:
               enabled: true
