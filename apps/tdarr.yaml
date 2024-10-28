@@ -43,7 +43,7 @@ spec:
                      - <tdarr | jsonPath {.url}>
     - chart: tdarr
       repoURL: tccr.io/truecharts
-      targetRevision: 11.10.1
+      targetRevision: 11.10.2
       helm:
         version: v3
         valuesObject:
