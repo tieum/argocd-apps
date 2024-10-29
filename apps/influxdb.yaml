@@ -102,6 +102,12 @@ spec:
                 bucket: default
                 organization: influxdata
                 token: <influxdb | jsonPath {.token}>
+            - file:
+                files:
+                  - stdout
+                flush_interval: 1s
+                flush_jitter: 1s
+                metric_batch_size: 10
           inputs:
             - socket_listener:
                 service_address: tcp://:12003
