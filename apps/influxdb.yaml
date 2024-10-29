@@ -112,8 +112,9 @@ spec:
             - socket_listener:
                 service_address: tcp://:12003
                 data_format: graphite
-                templates:
-                  - os.host.measurement.type.field
+            - socket_listener:
+                service_address: tcp://:12004
+                data_format: graphite
   destination:
     name: "in-cluster"
     namespace: telegraf
