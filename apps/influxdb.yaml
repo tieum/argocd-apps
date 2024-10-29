@@ -1,0 +1,42 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: influxdb
+  annotations:
+    avp.kubernetes.io/path: "../secrets.sops.yaml"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    chart: influxdb
+    repoURL: https://helm.influxdata.com
+    targetRevision: 4.12.5
+    helm:
+      version: v3
+      valuesObject:
+        persistence:
+          size: 10Gi
+        service:
+          annotations:
+            tailscale.com/expose: "true"
+        setDefaultUser:
+          enabled: true
+          password: <influxdb | jsonPath {.password}>
+        config:
+          graphite:
+           enabled: true
+           database: "graphitedb"
+           retention-policy: ""
+           bind-address: ":2003"
+           protocol: "tcp"
+           consistency-level: "one"
+           templates:
+             - "servers.* .host.resource.measurement.field*"
+  destination:
+    name: "in-cluster"
+    namespace: influxdb
+  syncPolicy:
+    automated: {}
+    syncOptions:
+    - CreateNamespace=true
