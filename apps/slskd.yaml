@@ -27,8 +27,8 @@ spec:
                       SLSKD_REMOTE_CONFIGURATION: true
                       APP_DIR: "{{.Values.persistence.data.mountPath }}"
                       SLSKD_SHARED_DIR: "{{.Values.persistence.share.mountPath }}"
-                      SLSKD_DOWNLOADS_DIR: "{{ .Values.persistence.complete.mountPath }}"
-                      SLSKD_INCOMPLETE_DIR: "{{ .Values.persistence.incomplete.mountPath }}"
+                      SLSKD_DOWNLOADS_DIR: "{{ .Values.persistence.servarr.mountPath }}/downloads/slskd/complete"
+                      SLSKD_INCOMPLETE_DIR: "{{ .Values.persistence.servarr.mountPath }}/downloads/slskd/incomplete"
                       SLSKD_USERNAME: "<slskd | jsonPath {.username}>"
                       SLSKD_PASSWORD: "<slskd | jsonPath {.password}>"
                       SLSKD_SLSK_USERNAME: "<slskd | jsonPath {.username}>"
@@ -54,19 +54,17 @@ spec:
               storageClass: nfs-client
               size: 10Gi
               mountPath: "/share"
-            incomplete:
-              enabled: true
-              type: pvc
-              storageClass: nfs-client
-              size: 1Gi
-              mountPath: "/downloads/incomplete"
-            complete:
+            servarr:
               enabled: true
               type: nfs
-              server: <nfs | jsonPath {.server}>
-              path: <nfs | jsonPath {.path}>/slskd-downloads
-              mountPath: "/downloads/complete"
+              server: <nfs | jsonPath {.ip}>
+              path: <nfs | jsonPath {.mountpoint}>
+              mountPath: "/servarr"
               accessModes: [ReadWriteMany]
+            incomplete:
+              enabled: false
+            complete:
+              enabled: false
           portal:
             open:
               enabled: false
