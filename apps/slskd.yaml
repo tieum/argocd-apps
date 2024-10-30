@@ -15,6 +15,22 @@ spec:
       helm:
         version: v3
         valuesObject:
+          addons:
+            vpn:
+              type: gluetun
+              killSwitch: true
+              excludedNetworks_IPv4:
+                - 10.10.0.0/16
+                - 10.96.0.0/12
+              envList:
+                - name: VPN_SERVICE_PROVIDER
+                  value: protonvpn
+                - name: OPENVPN_USER
+                  value: <vpn| jsonPath {.userpmp}>
+                - name: OPENVPN_PASSWORD
+                  value: <vpn| jsonPath {.password}>
+                - name: SERVER_COUNTRIES
+                  value: France
           workload:
             main:
               podSpec:
