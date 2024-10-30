@@ -8,132 +8,83 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
-  sources:
-    - chart: kube-prometheus-stack
-      repoURL: https://prometheus-community.github.io/helm-charts
-      targetRevision: 65.5.0
-      helm:
-        version: v3
-        valuesObject:
-          prometheus:
-            prometheusSpec:
-              serviceMonitorSelectorNilUsesHelmValues: false
-              containers:
-              - name: graphite-exporter
-                image: prom/graphite-exporter
-                ports:
-                - containerPort: 9108
-                  name: metrics
-                  protocol: TCP
-                - containerPort: 9109
-                  name: graphite
-                  protocol: TCP
-              additionalScrapeConfigs:
-                 - job_name: truenas
-                   scrape_interval: 1m
-                   metrics_path: /metrics
-                   static_configs:
-                   - targets:
-                      - graphite-exporter:9108
-            ingress:
-              enabled: true
-              ingressClassName: nginx
-              annotations:
-                external-dns.alpha.kubernetes.io/hostname: <prometheus| jsonPath {.url}>
-                cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
-                nginx.ingress.kubernetes.io/auth-url: "https://<eas | jsonPath {.endpoint}>/verify?redirect_http_code=401&config_token_store_id=primary&config_token_id=github"
-                nginx.ingress.kubernetes.io/auth-signin: "https://<eas | jsonPath {.endpoint}>/nginx/auth-signin?rd=$auth_redirect"
-                nginx.ingress.kubernetes.io/configuration-snippet: |
-                  auth_request_set $auth_redirect $upstream_http_location;
-              hosts:
+  source:
+    chart: kube-prometheus-stack
+    repoURL: https://prometheus-community.github.io/helm-charts
+    targetRevision: 65.5.0
+    helm:
+      version: v3
+      valuesObject:
+        prometheus:
+          prometheusSpec:
+            serviceMonitorSelectorNilUsesHelmValues: false
+          ingress:
+            enabled: true
+            ingressClassName: nginx
+            annotations:
+              external-dns.alpha.kubernetes.io/hostname: <prometheus| jsonPath {.url}>
+              cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
+              nginx.ingress.kubernetes.io/auth-url: "https://<eas | jsonPath {.endpoint}>/verify?redirect_http_code=401&config_token_store_id=primary&config_token_id=github"
+              nginx.ingress.kubernetes.io/auth-signin: "https://<eas | jsonPath {.endpoint}>/nginx/auth-signin?rd=$auth_redirect"
+              nginx.ingress.kubernetes.io/configuration-snippet: |
+                auth_request_set $auth_redirect $upstream_http_location;
+            hosts:
+              - <prometheus| jsonPath {.url}>
+            tls:
+              - secretName: prometheus-general-tls
+                hosts:
                 - <prometheus| jsonPath {.url}>
-              tls:
-                - secretName: prometheus-general-tls
-                  hosts:
-                  - <prometheus| jsonPath {.url}>
-          grafana:
-            adminPassword: <grafana | jsonPath {.adminpassword}>
-            ingress:
-              enabled: true
-              ingressClassName: nginx
-              annotations:
-                external-dns.alpha.kubernetes.io/hostname: <grafana | jsonPath {.url}>
-                cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
-                nginx.ingress.kubernetes.io/auth-url: "https://<eas | jsonPath {.endpoint}>/verify?redirect_http_code=401&config_token_store_id=primary&config_token_id=github"
-                nginx.ingress.kubernetes.io/auth-signin: "https://<eas | jsonPath {.endpoint}>/nginx/auth-signin?rd=$auth_redirect"
-                nginx.ingress.kubernetes.io/configuration-snippet: |
-                  auth_request_set $auth_redirect $upstream_http_location;
-              hosts:
+        grafana:
+          adminPassword: <grafana | jsonPath {.adminpassword}>
+          ingress:
+            enabled: true
+            ingressClassName: nginx
+            annotations:
+              external-dns.alpha.kubernetes.io/hostname: <grafana | jsonPath {.url}>
+              cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
+              nginx.ingress.kubernetes.io/auth-url: "https://<eas | jsonPath {.endpoint}>/verify?redirect_http_code=401&config_token_store_id=primary&config_token_id=github"
+              nginx.ingress.kubernetes.io/auth-signin: "https://<eas | jsonPath {.endpoint}>/nginx/auth-signin?rd=$auth_redirect"
+              nginx.ingress.kubernetes.io/configuration-snippet: |
+                auth_request_set $auth_redirect $upstream_http_location;
+            hosts:
+              - <grafana | jsonPath {.url}>
+            tls:
+              - secretName: grafana-general-tls
+                hosts:
                 - <grafana | jsonPath {.url}>
-              tls:
-                - secretName: grafana-general-tls
-                  hosts:
-                  - <grafana | jsonPath {.url}>
-            # Provision grafana-dashboards-kubernetes
-            dashboardProviders:
-              dashboardproviders.yaml:
-                apiVersion: 1
-                providers:
-                - name: 'grafana-dashboards-kubernetes'
-                  orgId: 1
-                  folder: 'Kubernetes'
-                  type: file
-                  disableDeletion: true
-                  editable: true
-                  options:
-                    path: /var/lib/grafana/dashboards/grafana-dashboards-kubernetes
-            dashboards:
-              grafana-dashboards-kubernetes:
-                k8s-system-api-server:
-                  url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-system-api-server.json
-                  token: ''
-                k8s-system-coredns:
-                  url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-system-coredns.json
-                  token: ''
-                k8s-views-global:
-                  url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-global.json
-                  token: ''
-                k8s-views-namespaces:
-                  url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-namespaces.json
-                  token: ''
-                k8s-views-nodes:
-                  url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-nodes.json
-                  token: ''
-                k8s-views-pods:
-                  url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-pods.json
-                  token: ''
-    - chart: k8s-resources
-      repoURL: https://charts.deliveryhero.io/
-      targetRevision: 0.6.6
-      helm:
-        version: v3
-        valuesObject:
-          Services:
-            - name: graphite-exporter
-              fullnameOverride: graphite-exporter
-              type: ClusterIP
-              annotations:
-                tailscale.com/expose: "true"
-              selector:
-                app.kubernetes.io/name: prometheus
-                operator.prometheus.io/name: prometheus-stack-kube-prom-prometheus
-              ports:
-                - port: 9108
-                  targetPort: 9108
-                  protocol: TCP
-                  name: metrics-tcp
-                - port: 9108
-                  targetPort: 9108
-                  protocol: UDP
-                  name: metrics-udp
-                - port: 9109
-                  targetPort: 9109
-                  protocol: TCP
-                  name: graphite-tcp
-                - port: 9109
-                  targetPort: 9109
-                  protocol: UDP
-                  name: graphite-udp
+          # Provision grafana-dashboards-kubernetes
+          dashboardProviders:
+            dashboardproviders.yaml:
+              apiVersion: 1
+              providers:
+              - name: 'grafana-dashboards-kubernetes'
+                orgId: 1
+                folder: 'Kubernetes'
+                type: file
+                disableDeletion: true
+                editable: true
+                options:
+                  path: /var/lib/grafana/dashboards/grafana-dashboards-kubernetes
+          dashboards:
+            grafana-dashboards-kubernetes:
+              k8s-system-api-server:
+                url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-system-api-server.json
+                token: ''
+              k8s-system-coredns:
+                url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-system-coredns.json
+                token: ''
+              k8s-views-global:
+                url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-global.json
+                token: ''
+              k8s-views-namespaces:
+                url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-namespaces.json
+                token: ''
+              k8s-views-nodes:
+                url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-nodes.json
+                token: ''
+              k8s-views-pods:
+                url: https://raw.githubusercontent.com/dotdc/grafana-dashboards-kubernetes/master/dashboards/k8s-views-pods.json
+                token: ''
   destination:
     name: "in-cluster"
     namespace: prometheus
