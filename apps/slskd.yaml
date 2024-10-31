@@ -44,9 +44,9 @@ spec:
                       SLSKD_HTTP_PORT: 5030
                       SLSKD_REMOTE_CONFIGURATION: true
                       APP_DIR: "{{.Values.persistence.data.mountPath }}"
-                      SLSKD_SHARED_DIR: "{{ .Values.persistence.servarr.mountPath }}/music"
-                      SLSKD_DOWNLOADS_DIR: "{{ .Values.persistence.servarr.mountPath }}/downloads/slskd/complete"
-                      SLSKD_INCOMPLETE_DIR: "{{ .Values.persistence.servarr.mountPath }}/downloads/slskd/incomplete"
+                      SLSKD_SHARED_DIR: "{{ .Values.persistence.nfs.mountPath }}/<slskd | jsonPath {.shareddir}>"
+                      SLSKD_DOWNLOADS_DIR: "{{ .Values.persistence.nfs.mountPath }}/<slskd | jsonPath {.downloadscompletedir}>"
+                      SLSKD_INCOMPLETE_DIR: "{{ .Values.persistence.nfs.mountPath }}/<slskd | jsonPath {.downloadsincompletedir}>"
                       SLSKD_USERNAME: "<slskd | jsonPath {.username}>"
                       SLSKD_PASSWORD: "<slskd | jsonPath {.password}>"
                       SLSKD_SLSK_USERNAME: "<slskd | jsonPath {.username}>"
@@ -68,12 +68,12 @@ spec:
               mountPath: "/app"
             share:
               enabled: false
-            servarr:
+            nfs:
               enabled: true
               type: nfs
               server: <nfs | jsonPath {.ip}>
               path: <nfs | jsonPath {.mountpoint}>
-              mountPath: "/servarr"
+              mountPath: <slskd | jsonPath {.nfsmountpath}>
               accessModes: [ReadWriteMany]
             incomplete:
               enabled: false
