@@ -29,6 +29,8 @@ spec:
                   value: <vpn| jsonPath {.userpmp}>
                 - name: OPENVPN_PASSWORD
                   value: <vpn| jsonPath {.password}>
+                - name:  VPN_PORT_FORWARDING
+                  value: on
                 - name: SERVER_COUNTRIES
                   value: France
           workload:
@@ -81,7 +83,7 @@ spec:
             open:
               enabled: false
     - chart: k8s-resources
-      repoURL: https://charts.deliveryhero.io/
+      repoURL: ghcr.io/deliveryhero/helm-charts
       targetRevision: 0.6.6
       helm:
         version: v3
@@ -112,6 +114,35 @@ spec:
                  - secretName: slskd-tls
                    hosts:
                      - <slskd | jsonPath {.url}>
+          CronJobs:
+            - name: update-portforward
+              fullnameOverride: update-portforward
+              schedule: |
+                */5 * * * *
+              containers:
+                - name: update-portforward
+                  image: ghcr.io/tieum/slskd-port-forward-gluetun-server:main
+          ClusterRoles:
+            - name: portfwd
+              fullnameOverride: portfwd
+              rules:
+              - apiGroups: [""]
+                resources: [pods]
+                verbs: [list]
+              - apiGroups: [""]
+                resources: [pods/exec]
+                verbs: [create, get]
+          ClusterRoleBindings:
+            - name: portfwd
+              fullnameOverride: portfwd
+              roleRef:
+                apiGroup: rbac.authorization.k8s.io
+                kind: ClusterRole
+                name: portfwd
+              subjects:
+              - kind: ServiceAccount
+                name: default
+                namespace: slskd
   destination:
     name: "in-cluster"
     namespace: slskd
