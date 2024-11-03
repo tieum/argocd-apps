@@ -2,6 +2,8 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: ingress-nginx
+  annotations:
+    avp.kubernetes.io/path: "../secrets.sops.yaml"
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
@@ -14,12 +16,16 @@ spec:
       version: v3
       valuesObject:
         controller:
+          config:
+            enable-real-ip: "true"
+            use-forwarded-headers: "true"
+            proxy-real-ip-cidr: "<ingress-nginx | jsonPath {.externalip}>/32"
           nodeSelector:
             zone: cloud
           allowSnippetAnnotations: true
         service:
           externalIPs:
-          - <ingress-nginx | jsonPath {.externalip} >
+          - <ingress-nginx | jsonPath {.externalip}>
   destination:
     name: "in-cluster"
     namespace: ingress-nginx
