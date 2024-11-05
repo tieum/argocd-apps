@@ -11,7 +11,7 @@ spec:
   sources:
     - chart: homarr
       repoURL: tccr.io/truecharts
-      targetRevision: 12.2.2
+      targetRevision: 12.2.3
       helm:
         version: v3
         valuesObject:
