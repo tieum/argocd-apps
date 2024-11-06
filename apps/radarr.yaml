@@ -86,17 +86,9 @@ spec:
           Ingresses:
             - name: radarr
               fullnameOverride: radarr
-              ingressClassName: nginx
-              annotations:
-                external-dns.alpha.kubernetes.io/hostname: <radarr | jsonPath {.url}>
-                cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
-                nginx.ingress.kubernetes.io/auth-url: "https://<eas | jsonPath {.endpoint}>/verify?redirect_http_code=401&config_token_store_id=primary&config_token_id=github"
-                nginx.ingress.kubernetes.io/auth-signin: "https://<eas | jsonPath {.endpoint}>/nginx/auth-signin?rd=$auth_redirect"
-                nginx.ingress.kubernetes.io/configuration-snippet: |
-                  auth_request_set $auth_redirect $upstream_http_location;
+              ingressClassName: tailscale
               rules:
-                - host: <radarr | jsonPath {.url}>
-                  http:
+                - http:
                     paths:
                       - path: /
                         pathType: Prefix
@@ -106,9 +98,8 @@ spec:
                             port:
                               number: 7878
               tls:
-                 - secretName: radarr-tls
-                   hosts:
-                     - <radarr | jsonPath {.url}>
+                 - hosts:
+                     - radarr
   destination:
     name: "in-cluster"
     namespace: radarr
