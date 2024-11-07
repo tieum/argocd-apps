@@ -61,11 +61,7 @@ spec:
                       CONFIG: ""
           persistence:
             config:
-              enabled: true
-              type: pvc
-              storageClass: nfs-client
               size: 1Gi
-              mountPath: "/config"
             servarr:
               enabled: true
               type: nfs
@@ -78,8 +74,8 @@ spec:
               enabled: false
           updated: false
     - chart: k8s-resources
-      repoURL: https://charts.deliveryhero.io/
-      targetRevision: 0.6.6
+      repoURL: ghcr.io/deliveryhero/helm-charts
+      targetRevision: 0.8.0
       helm:
         version: v3
         valuesObject:
