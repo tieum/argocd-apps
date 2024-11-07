@@ -40,7 +40,7 @@ spec:
                      - <immich | jsonPath {.url}>
     - chart: immich
       repoURL: tccr.io/truecharts
-      targetRevision: 17.23.3
+      targetRevision: 17.23.4
       helm:
         version: v3
         valuesObject:
