@@ -1,0 +1,55 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: flood
+  annotations:
+    avp.kubernetes.io/path: "../secrets.sops.yaml"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  sources:
+    - chart: flood
+      repoURL: tccr.io/truecharts
+      targetRevision: 15.2.3
+      helm:
+        version: v3
+        valuesObject:
+          persistence:
+            data:
+              size: 50Mi
+          portal:
+            open:
+              enabled: false
+          updated: false
+    - chart: k8s-resources
+      repoURL: ghcr.io/deliveryhero/helm-charts
+      targetRevision: 0.8.0
+      helm:
+        version: v3
+        valuesObject:
+          Ingresses:
+            - name: flood
+              fullnameOverride: flood
+              ingressClassName: tailscale
+              rules:
+                - http:
+                    paths:
+                      - path: /
+                        pathType: Prefix
+                        backend:
+                          service:
+                            name: flood
+                            port:
+                              number: 10036
+              tls:
+                 - hosts:
+                     - flood
+  destination:
+    name: "in-cluster"
+    namespace: flood
+  syncPolicy:
+    automated: {}
+    syncOptions:
+    - CreateNamespace=true
+    - ApplyOutOfSyncOnly=true
