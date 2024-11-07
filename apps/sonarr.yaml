@@ -62,11 +62,7 @@ spec:
                       ENABLE_ADDITIONAL_METRICS: true
           persistence:
             config:
-              enabled: true
-              type: pvc
-              storageClass: nfs-client
               size: 1Gi
-              mountPath: "/config"
             servarr:
               enabled: true
               type: nfs
@@ -79,25 +75,17 @@ spec:
               enabled: false
           updated: false
     - chart: k8s-resources
-      repoURL: https://charts.deliveryhero.io/
-      targetRevision: 0.6.6
+      repoURL: ghcr.io/deliveryhero/helm-charts
+      targetRevision: 0.8.0
       helm:
         version: v3
         valuesObject:
           Ingresses:
             - name: sonarr
               fullnameOverride: sonarr
-              ingressClassName: nginx
-              annotations:
-                external-dns.alpha.kubernetes.io/hostname: <sonarr | jsonPath {.url}>
-                cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
-                nginx.ingress.kubernetes.io/auth-url: "https://<eas | jsonPath {.endpoint}>/verify?redirect_http_code=401&config_token_store_id=primary&config_token_id=github"
-                nginx.ingress.kubernetes.io/auth-signin: "https://<eas | jsonPath {.endpoint}>/nginx/auth-signin?rd=$auth_redirect"
-                nginx.ingress.kubernetes.io/configuration-snippet: |
-                  auth_request_set $auth_redirect $upstream_http_location;
+              ingressClassName: tailscale
               rules:
-                - host: <sonarr | jsonPath {.url}>
-                  http:
+                - http:
                     paths:
                       - path: /
                         pathType: Prefix
@@ -107,9 +95,8 @@ spec:
                             port:
                               number: 8989
               tls:
-                 - secretName: sonarr-tls
-                   hosts:
-                     - <sonarr | jsonPath {.url}>
+                 - hosts:
+                     - sonarr
   destination:
     name: "in-cluster"
     namespace: sonarr
