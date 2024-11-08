@@ -20,7 +20,7 @@ spec:
             tag: latest
           persistence:
             config:
-              size: 300Mi
+              size: 600Mi
             data:
               size: 200Mi
           workload:
