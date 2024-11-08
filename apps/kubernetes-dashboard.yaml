@@ -19,17 +19,8 @@ spec:
           ingress:
             enabled: true
             hosts:
-             - <kubernetes-dashboard | jsonPath {.url}>
-            ingressClassName: nginx
-            annotations:
-              external-dns.alpha.kubernetes.io/hostname: <kubernetes-dashboard | jsonPath {.url}>
-              nginx.ingress.kubernetes.io/auth-url: "https://<eas | jsonPath {.endpoint}>/verify?redirect_http_code=401&config_token_store_id=primary&config_token_id=github"
-              nginx.ingress.kubernetes.io/auth-signin: "https://<eas | jsonPath {.endpoint}>/nginx/auth-signin?rd=$auth_redirect"
-              nginx.ingress.kubernetes.io/configuration-snippet: |
-                auth_request_set $auth_redirect $upstream_http_location;
-            issuer:
-              name: "letsencrypt-dns-prod"
-              scope: cluster
+             - k8s-dashboard
+            ingressClassName: tailscale
   destination:
     name: "in-cluster"
     namespace: kubernetes-dashboard
