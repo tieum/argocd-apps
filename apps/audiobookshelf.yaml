@@ -1,0 +1,70 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: audiobookshelf
+  annotations:
+    avp.kubernetes.io/path: "../secrets.sops.yaml"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  sources:
+    - chart: audiobookshelf
+      repoURL: tccr.io/truecharts
+      targetRevision: 11.8.2
+      helm:
+        version: v3
+        valuesObject:
+          persistence:
+            config:
+              size: 100Mi
+            metadata:
+              size: 400Mi
+            audiobooks:
+              type: nfs
+              server: <nfs | jsonPath {.ip}>
+              path: <nfs | jsonPath {.mountpoint}>/audiobooks
+              mountPath: "/audiobooks"
+              accessModes: [ReadWriteMany]
+            podcasts:
+              enabled: true
+              type: nfs
+              server: <nfs | jsonPath {.ip}>
+              path: <nfs | jsonPath {.mountpoint}>/podcasts
+              mountPath: "/podcasts"
+              accessModes: [ReadWriteMany]
+          portal:
+            open:
+              enabled: false
+          updated: false
+    - chart: k8s-resources
+      repoURL: ghcr.io/deliveryhero/helm-charts
+      targetRevision: 0.8.0
+      helm:
+        version: v3
+        valuesObject:
+          Ingresses:
+            - name: audiobookshelf
+              fullnameOverride: audiobookshelf
+              ingressClassName: tailscale
+              rules:
+                - http:
+                    paths:
+                      - path: /
+                        pathType: Prefix
+                        backend:
+                          service:
+                            name: audiobookshelf
+                            port:
+                              number: 10223
+              tls:
+                 - hosts:
+                     - audiobookshelf
+  destination:
+    name: "in-cluster"
+    namespace: audiobookshelf
+  syncPolicy:
+    automated: {}
+    syncOptions:
+    - CreateNamespace=true
+    - ApplyOutOfSyncOnly=true
