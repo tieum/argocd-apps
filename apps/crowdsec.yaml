@@ -39,6 +39,9 @@ spec:
           lapi:
             dashboard:
               enabled: true
+            env:
+            - name: BOUNCER_KEY_ingress-nginx
+              value: <crowdsec | jsonPath {.nginx-bouncer}>
     - chart: k8s-resources
       repoURL: ghcr.io/deliveryhero/helm-charts
       targetRevision: 0.8.0

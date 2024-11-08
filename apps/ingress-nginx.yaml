@@ -34,7 +34,7 @@ spec:
               - name: API_URL
                 value: "http://crowdsec-service.crowdsec.svc.cluster.local:8080"
               - name: API_KEY
-                value: "<ingress-nginx | jsonPath {.crowdsec-bouncer}>"
+                value: <crowdsec | jsonPath {.nginx-bouncer}>
               - name: BOUNCER_CONFIG
                 value: "/crowdsec/crowdsec-bouncer.conf"
             command: ['sh', '-c', "apk update; apk add bash; bash /docker_start.sh; mkdir -p /lua_plugins/crowdsec/; cp -R /crowdsec/* /lua_plugins/crowdsec/"]
