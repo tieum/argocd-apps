@@ -15,14 +15,21 @@ spec:
       helm:
         version: v3
         valuesObject:
+          image:
+            repository: ghcr.io/organizr/organizr
+            tag: latest
           persistence:
             config:
               size: 300Mi
             data:
               size: 200Mi
-          portal:
-            open:
-              enabled: false
+          workload:
+            main:
+              podSpec:
+                containers:
+                  main:
+                    env:
+                      branch: v2-develop
     - chart: k8s-resources
       repoURL: ghcr.io/deliveryhero/helm-charts
       targetRevision: 0.8.0
