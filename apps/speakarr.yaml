@@ -1,0 +1,58 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: speakarr
+  annotations:
+    avp.kubernetes.io/path: "../secrets.sops.yaml"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  sources:
+    - chart: speakarr
+      repoURL: tccr.io/truecharts
+      targetRevision: 24.1.1
+      helm:
+        version: v3
+        valuesObject:
+          persistence:
+            config:
+              size: 1Gi
+            servarr:
+              enabled: true
+              type: nfs
+              server: <nfs | jsonPath {.ip}>
+              path: <nfs | jsonPath {.mountpoint}>
+              mountPath: "/servarr"
+              accessModes: [ReadWriteMany]
+    - chart: k8s-resources
+      repoURL: ghcr.io/deliveryhero/helm-charts
+      targetRevision: 0.8.0
+      helm:
+        version: v3
+        valuesObject:
+          Ingresses:
+            - name: speakarr
+              fullnameOverride: speakarr
+              ingressClassName: tailscale
+              rules:
+                - http:
+                    paths:
+                      - path: /
+                        pathType: Prefix
+                        backend:
+                          service:
+                            name: speakarr
+                            port:
+                              number: 8787
+              tls:
+                 - hosts:
+                     - speakarr
+  destination:
+    name: "in-cluster"
+    namespace: speakarr
+  syncPolicy:
+    automated: {}
+    syncOptions:
+    - CreateNamespace=true
+    - ApplyOutOfSyncOnly=true
