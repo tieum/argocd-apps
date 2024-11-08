@@ -9,38 +9,6 @@ metadata:
 spec:
   project: default
   sources:
-    - chart: k8s-resources
-      repoURL: https://charts.deliveryhero.io/
-      targetRevision: 0.6.6
-      helm:
-        version: v3
-        valuesObject:
-          Ingresses:
-            - name: tdarr
-              fullnameOverride: tdarr
-              ingressClassName: nginx
-              annotations:
-                external-dns.alpha.kubernetes.io/hostname: <tdarr | jsonPath {.url}>
-                cert-manager.io/cluster-issuer: "letsencrypt-dns-prod"
-                nginx.ingress.kubernetes.io/auth-url: "https://<eas | jsonPath {.endpoint}>/verify?redirect_http_code=401&config_token_store_id=primary&config_token_id=github"
-                nginx.ingress.kubernetes.io/auth-signin: "https://<eas | jsonPath {.endpoint}>/nginx/auth-signin?rd=$auth_redirect"
-                nginx.ingress.kubernetes.io/configuration-snippet: |
-                  auth_request_set $auth_redirect $upstream_http_location;
-              rules:
-                - host: <tdarr | jsonPath {.url}>
-                  http:
-                    paths:
-                      - path: /
-                        pathType: Prefix
-                        backend:
-                          service:
-                            name: tdarr
-                            port: 
-                              number: 8265
-              tls:
-                 - secretName: tdarr-tls
-                   hosts:
-                     - <tdarr | jsonPath {.url}>
     - chart: tdarr
       repoURL: tccr.io/truecharts
       targetRevision: 11.10.2
@@ -96,6 +64,29 @@ spec:
           portal:
             open:
               enabled: false
+    - chart: k8s-resources
+      repoURL: ghcr.io/deliveryhero/helm-charts
+      targetRevision: 0.8.0
+      helm:
+        version: v3
+        valuesObject:
+          Ingresses:
+            - name: tdarr
+              fullnameOverride: tdarr
+              ingressClassName: tailscale
+              rules:
+                - http:
+                    paths:
+                      - path: /
+                        pathType: Prefix
+                        backend:
+                          service:
+                            name: tdarr
+                            port:
+                              number: 8265
+              tls:
+                 - hosts:
+                     - tdarr
   destination:
     name: "in-cluster"
     namespace: tdarr
