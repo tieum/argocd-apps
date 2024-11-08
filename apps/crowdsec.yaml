@@ -8,29 +8,51 @@ metadata:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
-  source:
-    chart: crowdsec
-    repoURL:  https://crowdsecurity.github.io/helm-charts
-    targetRevision: 0.13.0
-    helm:
-      version: v3
-      valuesObject:
-        container_runtime: containerd
-        agent:
-          acquisition:
-            - namespace: ingress-nginx
-              podName: ingress-nginx-controller-*
-              program: nginx
-          env:
-          - name: COLLECTIONS
-            value: "crowdsecurity/nginx"
-          - name: PARSERS
-            value: "crowdsecurity/cri-logs"
-          - name: DISABLE_PARSERS
-            value: "crowdsecurity/whitelists"
-        lapi:
-          dashboard:
-            enabled: true
+  sources:
+    - chart: crowdsec
+      repoURL:  https://crowdsecurity.github.io/helm-charts
+      targetRevision: 0.13.0
+      helm:
+        version: v3
+        valuesObject:
+          container_runtime: containerd
+          agent:
+            acquisition:
+              - namespace: ingress-nginx
+                podName: ingress-nginx-controller-*
+                program: nginx
+            env:
+            - name: COLLECTIONS
+              value: "crowdsecurity/nginx"
+            - name: PARSERS
+              value: "crowdsecurity/cri-logs"
+            - name: DISABLE_PARSERS
+              value: "crowdsecurity/whitelists"
+            extraVolumes:
+            - name: custom-http-context
+              configMap:
+                name: custom-http-context
+            extraVolumeMounts:
+            - name: custom-http-context
+              mountPath: /etc/crowdsec/contexts/custom_http_context.yaml
+              subPath: custom-http-context.yaml
+          lapi:
+            dashboard:
+              enabled: true
+    - chart: k8s-resources
+      repoURL: ghcr.io/deliveryhero/helm-charts
+      targetRevision: 0.8.0
+      helm:
+        version: v3
+        valuesObject:
+          ConfigMaps:
+          - name: custom-http-context
+            fullnameOverride: custom-http-context
+            multiline_data:
+              custom_http_context.yaml: |
+                context:
+                 http_referer:
+                  - evt.Parsed.http_referer
   destination:
     name: "in-cluster"
     namespace: crowdsec
