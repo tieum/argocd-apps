@@ -52,7 +52,7 @@ spec:
                               number: 10022
               tls:
                  - hosts:
-                     - organizr
+                     - dash
   destination:
     name: "in-cluster"
     namespace: organizr
