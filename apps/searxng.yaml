@@ -20,14 +20,7 @@ spec:
               zone: "cloud"
           persistence:
             config:
-              enabled: true
-              type: pvc
-              storageClass: nfs-client
               size: 10Mi
-              mountPath: "/etc/searxng"
-          portal:
-            open:
-              enabled: false
     - chart: k8s-resources
       repoURL: https://charts.deliveryhero.io/
       targetRevision: 0.6.6
@@ -52,7 +45,7 @@ spec:
                         backend:
                           service:
                             name: searxng
-                            port: 
+                            port:
                               number: 8080
               tls:
                  - secretName: searxng-tls
