@@ -9,7 +9,7 @@ metadata:
 spec:
   project: default
   sources:
-    - chart: speakarr
+    - chart: readarr
       repoURL: tccr.io/truecharts
       targetRevision: 24.1.1
       helm:
@@ -42,7 +42,7 @@ spec:
                         pathType: Prefix
                         backend:
                           service:
-                            name: speakarr
+                            name: speakarr-readarr
                             port:
                               number: 8787
               tls:
