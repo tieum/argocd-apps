@@ -17,14 +17,7 @@ spec:
         valuesObject:
           persistence:
             config:
-              enabled: true
-              type: pvc
-              storageClass: nfs-client
               size: 50Mi
-              mountPath: "/app/config"
-          portal:
-            open:
-              enabled: false
     - chart: k8s-resources
       repoURL: https://charts.deliveryhero.io/
       targetRevision: 0.6.6
@@ -47,7 +40,7 @@ spec:
                         backend:
                           service:
                             name: overseerr
-                            port: 
+                            port:
                               number: 5055
               tls:
                  - secretName: overseerr-tls
