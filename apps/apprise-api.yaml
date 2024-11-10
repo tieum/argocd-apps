@@ -11,7 +11,8 @@ spec:
     helm:
       valuesObject:
         persistence:
-          storageClass: nfs-client
+          storageClass: longhorn
+          storageSize: 50Mi
     path: charts/apprise-api
     repoURL: https://github.com/tieum/helm-charts.git
     targetRevision: main
