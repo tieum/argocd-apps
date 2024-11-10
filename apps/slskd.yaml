@@ -39,6 +39,7 @@ spec:
                 containers:
                   main:
                     env:
+                      DOTNET_HOSTBUILDER__RELOADCONFIGONCHANGE: false
                       SLSKD_SLSK_LISTEN_IP_ADDRESS: 0.0.0.0
                       SLSKD_SLSK_LISTEN_PORT: 50300
                       SLSKD_HTTP_PORT: 5030
@@ -61,11 +62,7 @@ spec:
               fsGroupChangePolicy: Always
           persistence:
             data:
-              enabled: true
-              type: pvc
-              storageClass: nfs-client
               size: 100Mi
-              mountPath: "/app"
             share:
               enabled: false
             nfs:
