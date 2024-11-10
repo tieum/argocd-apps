@@ -59,11 +59,7 @@ spec:
                   protocol: udp
           persistence:
             config:
-              enabled: true
-              type: pvc
-              storageClass: nfs-client
               size: 50Mi
-              mountPath: "/config"
             servarr:
               enabled: true
               type: nfs
