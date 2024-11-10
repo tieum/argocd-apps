@@ -15,9 +15,24 @@ spec:
       helm:
         version: v3
         valuesObject:
+          credentials:
+            minio:
+              type: s3
+              url: <minio | jsonPath {.endpoint}>
+              bucket: "backups"
+              accessKey: <minio | jsonPath {.accessKey}>
+              secretKey: <minio | jsonPath {.secretKey}>
+              encrKey: <minio | jsonPath {.encryptionKey}>
           cnpg:
             main:
               enabled: true
+              mode: recovery
+              backups:
+                enabled: true
+                credentials: minio
+              recovery:
+                method: object_store
+                credentials: minio
               user: sonarr
               database: sonarr
               cluster:
