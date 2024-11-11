@@ -15,6 +15,30 @@ spec:
       helm:
         version: v3
         valuesObject:
+          credentials:
+            minio:
+              type: s3
+              url: <minio | jsonPath {.endpoint}>
+              bucket: "backups"
+              accessKey: <minio | jsonPath {.accessKey}>
+              secretKey: <minio | jsonPath {.secretKey}>
+              encrKey: <minio | jsonPath {.encryptionKey}>
+          cnpg:
+            main:
+              enabled: true
+              backups:
+                enabled: true
+                credentials: minio
+              recovery:
+                method: object_store
+                credentials: minio
+              user: lidarr
+              database: lidarr
+              cluster:
+                  storage:
+                    size: 1Gi
+                  walStorage:
+                    size: 1Gi
           image:
             repository: ghcr.io/hotio/lidarr
             tag: pr-plugins
