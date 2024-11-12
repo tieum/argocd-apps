@@ -52,6 +52,24 @@ spec:
               tls:
                  - hosts:
                      - filebrowser
+            - name: filebrowser-share
+              fullnameOverride: filebrowser-share
+              ingressClassName: tailscale
+              annotations:
+                tailscale.com/funnel: "true"
+              rules:
+                - http:
+                    paths:
+                      - path: /api/public/dl/
+                        pathType: Prefix
+                        backend:
+                          service:
+                            name: filebrowser
+                            port:
+                              number: 10187
+              tls:
+                 - hosts:
+                     - share
   destination:
     name: "in-cluster"
     namespace: filebrowser
