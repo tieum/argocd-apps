@@ -15,6 +15,10 @@ spec:
       helm:
         version: v3
         valuesObject:
+          image:
+            repository: ghcr.io/tieum/filebrowser
+            tag: latest
+            pullPolicy: Always
           persistence:
             config:
               size: 50Mi
