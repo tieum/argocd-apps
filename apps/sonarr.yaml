@@ -40,7 +40,7 @@ spec:
                     size: 1Gi
                     storageClass: longhorn
                   walStorage:
-                    size: 1Gi
+                    size: 2Gi
                     storageClass: longhorn
           workload:
             main:

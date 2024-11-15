@@ -38,7 +38,7 @@ spec:
                   storage:
                     size: 1Gi
                   walStorage:
-                    size: 1Gi
+                    size: 2Gi
           image:
             repository: ghcr.io/hotio/lidarr
             tag: pr-plugins
