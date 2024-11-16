@@ -25,9 +25,11 @@ spec:
               encrKey: <minio | jsonPath {.encryptionKey}>
           cnpg:
             main:
+              mode: recovery
               enabled: true
               backups:
                 enabled: true
+                revision: "3"
                 credentials: minio
               recovery:
                 method: object_store
@@ -38,7 +40,7 @@ spec:
                   storage:
                     size: 1Gi
                   walStorage:
-                    size: 2Gi
+                    size: 800Mi
           image:
             repository: ghcr.io/hotio/lidarr
             tag: pr-plugins
