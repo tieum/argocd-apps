@@ -15,32 +15,6 @@ spec:
       helm:
         version: v3
         valuesObject:
-          credentials:
-            minio:
-              type: s3
-              url: <minio | jsonPath {.endpoint}>
-              bucket: "backups"
-              accessKey: <minio | jsonPath {.accessKey}>
-              secretKey: <minio | jsonPath {.secretKey}>
-              encrKey: <minio | jsonPath {.encryptionKey}>
-          cnpg:
-            main:
-              mode: recovery
-              enabled: true
-              backups:
-                enabled: true
-                revision: "3"
-                credentials: minio
-              recovery:
-                method: object_store
-                credentials: minio
-              user: lidarr
-              database: lidarr
-              cluster:
-                  storage:
-                    size: 1Gi
-                  walStorage:
-                    size: 800Mi
           image:
             repository: ghcr.io/hotio/lidarr
             tag: pr-plugins
@@ -82,11 +56,6 @@ spec:
                       LIDARR__LOG__ANALYTICS_ENABLED: False
                       LIDARR__LOG__DBENABLED: False
                       LIDARR__LOG__LEVEL: info
-                      LIDARR__POSTGRES__HOST: lidarr-cnpg-main-rw
-                      LIDARR__POSTGRES__MAINDB: lidarr
-                      LIDARR__POSTGRES__PASSWORD: <lidarr | jsonPath {.dbPassword}>
-                      LIDARR__POSTGRES__PORT: 5432
-                      LIDARR__POSTGRES__USER: postgres
                       LIDARR__SERVER__BINDADDRESS: "*"
                       LIDARR__SERVER__ENABLESSL: False
                       LIDARR__UPDATE__MECHANISM: Docker
