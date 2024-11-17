@@ -16,14 +16,10 @@ spec:
         version: v3
         valuesObject:
           plextraktsync:
-            task: "--sync all"
+            cron_enabled: false
           persistence:
             config:
-              enabled: true
-              type: hostPath
-              mountPath: "/app/config"
-              hostPath: /mnt/kube/plextraktsync/config
-              hostPathType: DirectoryOrCreate
+              size: 50Mi
           portal:
             open:
               enabled: false
