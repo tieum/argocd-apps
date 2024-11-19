@@ -19,11 +19,7 @@ spec:
             tag: pr-1282
           persistence:
             config:
-              enabled: true
-              type: hostPath
-              mountPath: "/config"
-              hostPath: /mnt/kube/flaresolverr/config
-              hostPathType: DirectoryOrCreate
+              enabled: false
           portal:
             open:
               enabled: false
