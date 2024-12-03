@@ -1,0 +1,98 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: immich
+  annotations:
+    avp.kubernetes.io/path: "../secrets.sops.yaml"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  sources:
+    - chart: immich
+      repoURL: https://immich-app.github.io/immich-charts
+      targetRevision: 0.8.4
+      helm:
+        version: v3
+        valuesObject:
+          image:
+            tag: v1.121.0
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 568
+          postgresql:
+            global:
+              postgresql:
+                auth:
+                  existingSecret: immich-app
+          env:
+            DB_HOSTNAME: immich-rw
+            DB_USERNAME: immich
+            DB_PASSWORD:
+              valueFrom:
+                secretKeyRef:
+                  name: immich-app
+                  key: password
+          persistence:
+            library:
+              type: nfs
+              server: <nfs | jsonPath {.ip}>
+              path: /mnt/pool0/photos
+              accessModes: [ReadWriteMany]
+          immich:
+            persistence:
+              library:
+                existingClaim: library
+          redis:
+            enabled: true
+    - chart: k8s-resources
+      repoURL: ghcr.io/deliveryhero/helm-charts
+      targetRevision: 0.8.0
+      helm:
+        version: v3
+        valuesObject:
+          CustomResources:
+            - name: immich
+              fullnameOverride: immich
+              apiVersion: postgresql.cnpg.io/v1
+              kind: Cluster
+              nameOverride: ""
+              spec:
+                imageName: ghcr.io/tensorchord/cloudnative-pgvecto.rs:16.5-v0.3.0
+                postgresql:
+                  shared_preload_libraries:
+                    - "vectors.so"
+                bootstrap:
+                  initdb:
+                    database: immich
+                    postInitApplicationSQL:
+                      - ALTER USER immich WITH SUPERUSER; 
+                storage:
+                  storageClass: longhorn
+                  size: 1Gi
+                  resizeInUseVolumes: true
+          Ingresses:
+            - name: immich
+              fullnameOverride: immich
+              ingressClassName: tailscale
+              rules:
+                - http:
+                    paths:
+                      - path: /
+                        pathType: Prefix
+                        backend:
+                          service:
+                            name: immich-server
+                            port:
+                              number: 2283
+              tls:
+                 - hosts:
+                     - photos
+  destination:
+    name: "in-cluster"
+    namespace: immich
+  syncPolicy:
+    automated: {}
+    syncOptions:
+    - CreateNamespace=true
+    - ApplyOutOfSyncOnly=true
