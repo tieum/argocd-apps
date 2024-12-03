@@ -1,0 +1,80 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: immich
+  annotations:
+    avp.kubernetes.io/path: "../secrets.sops.yaml"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  sources:
+    - chart: immich
+      repoURL: https://immich-app.github.io/immich-charts
+      targetRevision: 0.8.4
+      helm:
+        version: v3
+        valuesObject:
+          postgresql:
+            global:
+              postgresql:
+                auth:
+                  existingSecret: immich-app
+          env:
+            DB_HOSTNAME: immich-rw
+            DB_PASSOWRD:
+              valueFrom:
+                secretKeyRef:
+                  name: immich-app
+                  key: password
+          persistence:
+            library:
+              type: nfs
+              server: <nfs | jsonPath {.ip}>
+              path: /mnt/pool0/photos
+              mountPath: "/photos"
+              accessModes: [ReadWriteMany]
+          immich:
+            persistence:
+              library:
+                existingClaim: library
+          redis:
+            enabled: true
+    - chart: k8s-resources
+      repoURL: ghcr.io/deliveryhero/helm-charts
+      targetRevision: 0.8.0
+      helm:
+        version: v3
+        valuesObject:
+          CustomResources:
+            - name: immich
+              fullnameOverride: immich
+              apiVersion: postgresql.cnpg.io/v1
+              kind: Cluster
+              nameOverride: ""
+              spec:
+                imageName: ghcr.io/tensorchord/cloudnative-pgvecto.rs:17.2
+                postgresql:
+                  shared_preload_libraries:
+                    - "vectors.so"
+                affinity:
+                  podAntiAffinityType: preferred
+                bootstrap:
+                  initdb:
+                    database: immich
+                    postInitApplicationSQL:
+                      - CREATE EXTENSION cube;
+                      - CREATE EXTENSION earthdistance;
+                      - CREATE EXTENSION vectors;
+                storage:
+                  storageClass: longhorn
+                  size: 1Gi
+                  resizeInUseVolumes: true
+  destination:
+    name: "in-cluster"
+    namespace: immich
+  syncPolicy:
+    automated: {}
+    syncOptions:
+    - CreateNamespace=true
+    - ApplyOutOfSyncOnly=true
