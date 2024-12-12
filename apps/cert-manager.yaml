@@ -58,7 +58,7 @@ spec:
                         class: nginx
     - chart: cert-manager-webhook-ovh
       repoURL: https://aureq.github.io/cert-manager-webhook-ovh/
-      targetRevision: 0.7.1
+      targetRevision: 0.7.2
       helm:
         version: v3
         valuesObject:
