@@ -11,7 +11,7 @@ spec:
   sources:
     - chart: deemix
       repoURL: tccr.io/truecharts
-      targetRevision: 12.3.1
+      targetRevision: 12.3.2
       helm:
         version: v3
         valuesObject:
