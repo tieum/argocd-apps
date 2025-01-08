@@ -24,7 +24,7 @@ spec:
           updated: false
     - chart: k8s-resources
       repoURL: ghcr.io/deliveryhero/helm-charts
-      targetRevision: 0.8.0
+      targetRevision: 0.8.1
       helm:
         version: v3
         valuesObject:
