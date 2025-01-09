@@ -86,6 +86,17 @@ spec:
               path: <nfs | jsonPath {.mountpoint}>/downloads/slskd
               mountPath: "/slskd-downloads"
               accessModes: [ReadWriteMany]
+          metrics:
+            main:
+              enabled: true
+              type: "servicemonitor"
+              endpoints:
+                - port: metrics
+                  path: /metrics
+                  interval: 24h
+              targetSelector: metrics
+              prometheusRule:
+                enabled: false
           portal:
             open:
               enabled: false
