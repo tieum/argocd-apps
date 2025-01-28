@@ -11,7 +11,7 @@ spec:
   sources:
     - chart: overseerr
       repoURL: tccr.io/truecharts
-      targetRevision: 15.5.0
+      targetRevision: 15.5.1
       helm:
         version: v3
         valuesObject:
