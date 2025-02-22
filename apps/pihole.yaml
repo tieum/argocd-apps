@@ -11,7 +11,7 @@ spec:
   sources:
     - chart: pihole
       repoURL: tccr.io/truecharts
-      targetRevision: 18.7.1
+      targetRevision: 19.0.3
       helm:
         version: v3
         valuesObject:
