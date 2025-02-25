@@ -11,7 +11,7 @@ spec:
   source:
     chart: kubernetes-dashboard
     repoURL: https://kubernetes.github.io/dashboard/
-    targetRevision: 7.10.4
+    targetRevision: 7.10.5
     helm:
       version: v3
       valuesObject:
