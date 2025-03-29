@@ -11,7 +11,7 @@ spec:
   sources:
     - chart: sonarr
       repoURL: tccr.io/truecharts
-      targetRevision: 23.6.8
+      targetRevision: 23.7.0
       helm:
         version: v3
         valuesObject:
