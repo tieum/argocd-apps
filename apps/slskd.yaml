@@ -11,7 +11,7 @@ spec:
   sources:
     - chart: slskd
       repoURL: tccr.io/truecharts
-      targetRevision: 2.6.2
+      targetRevision: 3.0.3
       helm:
         version: v3
         valuesObject:
