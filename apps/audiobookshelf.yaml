@@ -11,7 +11,7 @@ spec:
   sources:
     - chart: audiobookshelf
       repoURL: tccr.io/truecharts
-      targetRevision: 11.16.0
+      targetRevision: 11.17.0
       helm:
         version: v3
         valuesObject:
