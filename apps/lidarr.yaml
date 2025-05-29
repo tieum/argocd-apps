@@ -11,7 +11,7 @@ spec:
   sources:
     - chart: lidarr
       repoURL: tccr.io/truecharts
-      targetRevision: 24.12.2
+      targetRevision: 24.12.3
       helm:
         version: v3
         valuesObject:
