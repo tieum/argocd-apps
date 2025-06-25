@@ -1,0 +1,58 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: rustdesk-server-oss
+  annotations:
+    avp.kubernetes.io/path: "../secrets.sops.yaml"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  sources:
+    - chart: rustdesk-server-oss
+      repoURL: https://schich.tel/helm-charts
+      targetRevision: 0.1.2
+      helm:
+        version: v3
+        valuesObject:
+          service:
+            externalTrafficPolicy: " "
+            enableWebClientSupport: true
+    - chart: k8s-resources
+      repoURL: ghcr.io/deliveryhero/helm-charts
+      targetRevision: 0.8.1
+      helm:
+        version: v3
+        valuesObject:
+          Ingresses:
+            - name: rustdesk
+              fullnameOverride: rustdesk
+              ingressClassName: tailscale
+              rules:
+                - http:
+                    paths:
+                      - path: /ws/relay
+                        pathType: Prefix
+                        backend:
+                          service:
+                            name: rustdesk-server-oss
+                            port:
+                              number: 21119
+                      - path: /ws/id
+                        pathType: Prefix
+                        backend:
+                          service:
+                            name: rustdesk-server-oss
+                            port:
+                              number: 21118
+              tls:
+                 - hosts:
+                     - rustdesk
+  destination:
+    name: "in-cluster"
+    namespace: rustdesk-server-oss
+  syncPolicy:
+    automated: {}
+    syncOptions:
+    - CreateNamespace=true
+    - ApplyOutOfSyncOnly=true
