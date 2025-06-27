@@ -11,7 +11,7 @@ spec:
   sources:
     - chart: searxng
       repoURL: tccr.io/truecharts
-      targetRevision: 9.5.55
+      targetRevision: 9.5.56
       helm:
         version: v3
         valuesObject:
