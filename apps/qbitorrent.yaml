@@ -11,7 +11,7 @@ spec:
   sources:
     - chart: qbittorrent
       repoURL: tccr.io/truecharts
-      targetRevision: 22.5.4
+      targetRevision: 22.5.5
       helm:
         version: v3
         valuesObject:
