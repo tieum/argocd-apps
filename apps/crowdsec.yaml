@@ -44,7 +44,7 @@ spec:
               value: <crowdsec | jsonPath {.nginx-bouncer}>
     - chart: k8s-resources
       repoURL: ghcr.io/deliveryhero/helm-charts
-      targetRevision: 0.8.1
+      targetRevision: 0.8.2
       helm:
         version: v3
         valuesObject:
