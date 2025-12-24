@@ -11,7 +11,7 @@ spec:
   sources:
     - chart: filebrowser
       repoURL: tccr.io/truecharts
-      targetRevision: 11.10.0
+      targetRevision: 12.27.4
       helm:
         version: v3
         valuesObject:
